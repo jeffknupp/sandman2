@@ -1,16 +1,27 @@
 #!/usr/bin/env python
+"""sandman2ctl is a wrapper around the sandman2 library, which creates REST API
+services automatically from existing databases."""
+
 import argparse
 from sandman2 import get_app, reflect_all
 
+
 def main():
+    """Main entry point for script."""
     parser = argparse.ArgumentParser(
         description='Auto-generate a RESTful API service '
         'from an existing database.'
         )
-    parser.add_argument('URI', help='Database URI in the format '
-        'postgresql+psycopg2://user:password@host/database')
-    parser.add_argument('-d', '--debug', help='Turn on debug logging',
-            action='store_true', default=False)
+    parser.add_argument(
+        'URI',
+        help='Database URI in the format '
+             'postgresql+psycopg2://user:password@host/database')
+    parser.add_argument(
+        '-d',
+        '--debug',
+        help='Turn on debug logging',
+        action='store_true',
+        default=False)
 
     args = parser.parse_args()
     app = get_app(args.URI)

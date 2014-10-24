@@ -51,6 +51,7 @@ def precondition_failed():
     response.status_code = 412
     return response
 
+
 def validate_fields(func):
     """A decorator to automatically detect missing required fields from
     json data."""
@@ -61,7 +62,9 @@ def validate_fields(func):
         if not data:
             raise BadRequestException('No data received from request')
         for key in data:
-            if key not in (instance.__model__.required() + instance.__model__.optional()):
+            if key not in (
+                    instance.__model__.required() +
+                    instance.__model__.optional()):
                 raise BadRequestException('Unknown field [{}]'.format(key))
         for required in set(instance.__model__.required()):
             if required not in data:

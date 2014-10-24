@@ -25,8 +25,9 @@ class BadRequestException(EndpointException):
 
 class ForbiddenException(EndpointException):
     """Raised when a request asks us to do something that we won't do because it
-    violates the application logic. *Does not refer to an authentication failure.*
-    Rather, it means the action requested is forbidden by the application."""
+    violates the application logic.
+    *Does not refer to an authentication failure.* Rather, it means the action
+    requested is forbidden by the application."""
 
     code = 403
 
