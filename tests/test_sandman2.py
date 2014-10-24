@@ -9,7 +9,7 @@ sys.path.insert(0, os.path.abspath('.'))
 import pytest
 from flask import Flask
 
-from sandman2 import get_app, reflect_all, db
+from sandman2 import get_app, db
 from tests.resources import *
 
 
@@ -18,8 +18,6 @@ PRISTINE_DATABASE_PATH = os.path.join('tests', 'data', 'db.sqlite3')
 application = get_app('sqlite+pysqlite:///tests/data/test_db.sqlite3')
 
 shutil.copy(PRISTINE_DATABASE_PATH, TEST_DATABASE_PATH)
-with application.app_context():
-    reflect_all()
 
 @pytest.yield_fixture(scope='function')
 def app():

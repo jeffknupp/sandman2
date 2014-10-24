@@ -42,7 +42,8 @@ def get_app(database_uri, reflect_all=True):
     admin.init_app(app)
     _register_error_handlers(app)
     if reflect_all:
-        _reflect_all()
+        with app.app_context():
+            _reflect_all()
     return app
 
 
