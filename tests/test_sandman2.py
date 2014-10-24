@@ -15,9 +15,9 @@ from tests.resources import *
 
 TEST_DATABASE_PATH = os.path.join('tests', 'data', 'test_db.sqlite3')
 PRISTINE_DATABASE_PATH = os.path.join('tests', 'data', 'db.sqlite3')
-application = get_app('sqlite+pysqlite:///tests/data/test_db.sqlite3')
 
 shutil.copy(PRISTINE_DATABASE_PATH, TEST_DATABASE_PATH)
+application = get_app('sqlite+pysqlite:///tests/data/test_db.sqlite3')
 
 @pytest.yield_fixture(scope='function')
 def app():
