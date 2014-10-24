@@ -1,8 +1,7 @@
-"""sandman2 is a RESTful API service generator for legacy databases."""
+"""*sandman2*'s main module."""
 
 # Third-party imports
 from flask import Flask, current_app, jsonify
-from flask.ext.admin.contrib.sqla import ModelView
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -30,17 +29,20 @@ Model = declarative_base(cls=(Model, db.Model))
 AutomapModel = automap_base(Model)
 
 
-def get_app(database_uri):
+def get_app(database_uri, reflect_all=True):
     """Return an application instance connected to the database described in
     *database_uri*.
 
     :param str database_uri: The URI connection string for the database
+    :param bool reflect_all: Include all database tables in the API service
     """
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
     db.init_app(app)
     admin.init_app(app)
     _register_error_handlers(app)
+    if reflect_all:
+        _reflect_all()
     return app
 
 
@@ -95,7 +97,7 @@ def register_service(cls, primary_key_type='int'):
         methods=methods - set(['POST']))
 
 
-def reflect_all():
+def _reflect_all():
     """Register all tables in the given database as services."""
     AutomapModel.prepare(  # pylint:disable=maybe-no-member
         db.engine, reflect=True)
