@@ -88,7 +88,8 @@ class Model(object):
 
         """
         link_dict = {'self': self.resource_uri()}
-        for relationship in inspect(self.__class__).relationships:  # pylint: disable=maybe-no-member
+        for relationship in inspect(  # pylint: disable=maybe-no-member
+                self.__class__).relationships:
             if 'collection' not in relationship.key:
                 instance = getattr(self, relationship.key)
                 if instance:

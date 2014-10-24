@@ -1,5 +1,6 @@
 """JSON-based Exception classes which generate proper HTTP Status Codes."""
 
+
 class EndpointException(Exception):
     """Base class for all Exceptions."""
 
