@@ -11,7 +11,8 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   sandman2
+   Quickstart <quickstart>
+   API <sandman2>
 
 
 Indices and tables
