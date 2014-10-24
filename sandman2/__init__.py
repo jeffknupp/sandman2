@@ -29,11 +29,9 @@ AutomapModel = automap_base(Model)
 _SERVICE_CLASSES = []
 
 
-
-
-def get_app(config):
+def get_app(database_uri):
     app = Flask(__name__)
-    app.config.from_object(config)
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
     db.init_app(app)
     admin.init_app(app)
     _register_error_handlers(app)

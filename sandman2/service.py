@@ -1,14 +1,27 @@
+"""Automatically generated REST API services from SQLAlchemy
+ORM models or a database introspection."""
+
+# Third-party imports
 from sqlalchemy.orm import lazyload
 from flask import request, make_response
 import flask
 from flask.views import MethodView
 
+# Application imports
 from sandman2.exception import NotFoundException
 from sandman2.model import db
 from sandman2.decorators import etag, validate_fields
 
 
 def add_link_headers(response, links):
+    """Return *response* with the proper link headers set, based on the contents
+    of *links*.
+
+    :param response: :class:`flask.Response` response object for links to be
+                     added
+    :param dict links: Dictionary of links to be added
+    :rtype :class:`flask.Response` :
+    """
     link_string = '<{}>; rel=self'.format(links['self'])
     for link in links.values():
         link_string += ', <{}>; rel=related'.format(link)

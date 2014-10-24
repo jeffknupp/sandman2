@@ -1,0 +1,25 @@
+#!/usr/bin/env python
+import argparse
+from sandman2 import get_app, reflect_all
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='Auto-generate a RESTful API service '
+        'from an existing database.'
+        )
+    parser.add_argument('URI', help='Database URI in the format '
+        'postgresql+psycopg2://user:password@host/database')
+    parser.add_argument('-d', '--debug', help='Turn on debug logging',
+            action='store_true', default=False)
+
+    args = parser.parse_args()
+    app = get_app(args.URI)
+    if args.debug:
+        app.config['DEBUG'] = True
+    with app.app_context():
+        reflect_all()
+    app.run()
+
+
+if __name__ == '__main__':
+    main()
