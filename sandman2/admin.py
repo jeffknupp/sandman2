@@ -5,6 +5,10 @@ interface."""
 
 # Third-party imports
 from flask.ext.admin.contrib.sqla import ModelView
+from flask.ext.admin import Admin
+
+
+admin = Admin(base_template='layout.html')
 
 
 class CustomAdminView(ModelView):  # pylint: disable=no-init

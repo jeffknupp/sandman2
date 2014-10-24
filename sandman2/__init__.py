@@ -2,10 +2,9 @@
 
 # Third-party imports
 from flask import Flask, current_app, jsonify
-from flask.ext.admin import Admin
+from flask.ext.admin.contrib.sqla import ModelView
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.ext.declarative import DeferredReflection
 
 # Application imports
 from sandman2.exception import (
@@ -19,8 +18,8 @@ from sandman2.exception import (
     ServiceUnavailableException,
     )
 from sandman2.service import Service
-from sandman2.admin import CustomAdminView
 from sandman2.model import db, Model
+from sandman2.admin import admin, CustomAdminView
 
 __version__ = '0.0'
 
@@ -29,7 +28,8 @@ Model = declarative_base(cls=(Model, db.Model))
 AutomapModel = automap_base(Model)
 _SERVICE_CLASSES = []
 
-admin = Admin(base_template='layout.html')
+
+
 
 def get_app(config):
     app = Flask(__name__)
@@ -37,7 +37,6 @@ def get_app(config):
     db.init_app(app)
     admin.init_app(app)
     _register_error_handlers(app)
-    app.model_map = {}
     return app
 
 def _register_error_handlers(app):
@@ -68,7 +67,6 @@ def register_service(cls, primary_key_type='int'):
                                     field
     """
     _SERVICE_CLASSES.append(cls)
-    current_app.model_map[cls.__model__.__table__] = cls
     view_func = cls.as_view(cls.__name__.lower())  # pylint: disable=no-member
     methods = set(cls.__model__.__methods__)  # pylint: disable=no-member
 

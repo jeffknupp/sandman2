@@ -35,7 +35,7 @@ class Service(MethodView):
     @etag
     def get(self, resource_id=None):
         if resource_id is None:
-            return jsonify({
+            return flask.jsonify({
                 self.__json_collection_name__: self._all_resources()
                 })
         else:
@@ -43,14 +43,13 @@ class Service(MethodView):
 
     def patch(self, resource_id=None):
         resource = self._resource(resource_id)
-        resource.from_dict(**request.json)
+        resource.update(request.json)
         db.session().merge(resource)
         db.session().commit()
         return jsonify(resource)
 
     @validate_fields
     def post(self):
-        self.__model__.required()
         resource = self.__model__.query.filter_by(**request.json).first()
         if resource:
             return self._no_content_response()
@@ -61,12 +60,13 @@ class Service(MethodView):
         return self._created_response(resource)
 
     def put(self, resource_id):
-        resource = self.__model__.query.filter(**request.json)
+        resource = self.__model__.query.get(resource_id)
         if resource:
-            resource.update(**request.json)
+            resource.update(request.json)
             db.session().merge(resource)
             db.session().commit()
             return jsonify(resource)
+
         resource = self.__model__(**request.json)
         db.session().add(resource)
         db.session().commit()
