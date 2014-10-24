@@ -1,4 +1,4 @@
-.PHONY: clean,all,docs,test,install
+.PHONY: clean, all, docs, test, install
 
 clean:
 	rm -rf *.out *.xml htmlcov
@@ -6,6 +6,9 @@ clean:
 install:
 	virtualenv venv && \
 		pip install -r requirements.txt
+
+docs: install
+	cd docs && make html && cd ..
 
 test: install
 	source venv/bin/activate && \
