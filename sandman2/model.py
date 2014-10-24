@@ -61,7 +61,7 @@ class Model(object):
 
     def primary_key(self):
         """Return the name of the model's primary key field.
-        
+
         :rtype: string
         """
         return list(
