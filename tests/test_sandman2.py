@@ -13,15 +13,9 @@ from sandman2 import get_app, reflect_all, db
 from tests.resources import *
 
 
-class ConfigObject(object):
-    def __init__(self, database_uri):
-        self.SQLALCHEMY_DATABASE_URI = database_uri
-
-
 TEST_DATABASE_PATH = os.path.join('tests', 'data', 'test_db.sqlite3')
 PRISTINE_DATABASE_PATH = os.path.join('tests', 'data', 'db.sqlite3')
-application = get_app(
-    ConfigObject('sqlite+pysqlite:///tests/data/test_db.sqlite3'))
+application = get_app('sqlite+pysqlite:///tests/data/test_db.sqlite3')
 
 shutil.copy(PRISTINE_DATABASE_PATH, TEST_DATABASE_PATH)
 with application.app_context():
