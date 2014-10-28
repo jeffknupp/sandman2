@@ -1,13 +1,28 @@
 # sandman2
+[![Build Status](https://travis-ci.org/jeffknupp/sandman2.svg?branch=master)](https://travis-ci.org/jeffknupp/sandman2)
+[![Coverage Status](https://img.shields.io/coveralls/jeffknupp/sandman2.svg)](https://coveralls.io/r/jeffknupp/sandman2?branch=master)
 
-sandman2 automagically generates RESTful APIs for existing databases.
-Why is that useful? Imagine you're working for AnonymousCorp and need to access
+sandman2 automagically generates a RESTful API service from your existing database,
+without requiring you to write a line of code. Simply point sandman2 to your
+database, add salt for seasoning, and voila!, a fully RESTful API service with
+hypermedia support starts running, ready to accept HTTP requests.  
+
+This is a big deal. It means every single database you interact with, from the
+SQLite database that houses your web browser's data up to your production
+PostgreSQL server can be endowed with a REST API and accessed programatically,
+using any number of HTTP client libraries available in *every* language.
+sandman2 *frees your data*.
+
+**For developers:**
+
+Imagine you're working for AnonymousCorp and need to access
 Group Y's data, which is presented to you through some horrible API or GUI.
 Wouldn't it be nice if you could just interact with that database through a REST
 API?
 
 More than that, imagine if you could interact with the database through a REST
-API **and no one had to write any code**. No boilerplate ORM code, no database
+API **and no one had to write any code**. Not you. Not Group Y. No one.
+That means no boilerplate ORM code, no database
 connection logic. Nothing. sandman2 can be run as a command-line tool
 (`sandman2ctl`) that just takes your database information as parameters and
 connects to it, introspects the schema, generates a RESTful API, and starts the server.
@@ -65,7 +80,7 @@ Third-party packages extend support to:
 
 ## Admin Interface
 
-One of the best things about the original [sandman](http://www.github.com/jeffknupp/sandman) was the *Admin Interface*. Not only does sandman2 include the Admin Interface, but it modernize's it as well. The layout has been greatly improved, especially when dealing with more than about eight tables. All of the original functionality of the Admin Interface remains unchanged.
+One of the best things about the original [sandman](http://www.github.com/jeffknupp/sandman) was the *Admin Interface*. Not only does sandman2 include the Admin Interface, but it modernize's it as well. The layout has been greatly improved, especially when dealing with larger numbers of tables. All of the original functionality of the Admin Interface remains unchanged.
 
 Here's a shot of the new look:
 
