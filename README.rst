@@ -47,6 +47,10 @@ the rewrite project. ``sandman2`` is that project. While I'll continue
 to support ``sandman`` in the nearterm, ``sandman2`` definitely
 represents the way forward.
 
+**NOTE**: ``sandman2`` is not yet at feature parity with the original
+``sandman``, but should be soon. Getting there is currently the top
+priority.
+
 Quickstart
 ----------
 
