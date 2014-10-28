@@ -36,7 +36,6 @@ class PyTest(TestCommand):
             '--strict',
             '--verbose',
             '--tb=long',
-            '--cov=sandman2',
             'tests']
         self.test_suite = True
 
