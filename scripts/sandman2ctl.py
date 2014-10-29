@@ -3,7 +3,7 @@
 services automatically from existing databases."""
 
 import argparse
-from sandman2 import get_app, reflect_all
+from sandman2 import get_app
 
 
 def main():
@@ -22,14 +22,28 @@ def main():
         help='Turn on debug logging',
         action='store_true',
         default=False)
+    parser.add_argument(
+        '-p',
+        '--port',
+        help='Port for service to listen on',
+        default=5000)
+    parser.add_argument(
+        '-l',
+        '--local-only',
+        help='Only provide service on localhost (will not be accessible'
+             ' from other machines)',
+        action='store_true',
+        default=False)
 
     args = parser.parse_args()
     app = get_app(args.URI)
     if args.debug:
         app.config['DEBUG'] = True
-    with app.app_context():
-        reflect_all()
-    app.run()
+    if args.local_only:
+        host = '127.0.0.1'
+    else:
+        host = '0.0.0.0'
+    app.run(host=host, port=int(args.port))
 
 
 if __name__ == '__main__':
