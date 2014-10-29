@@ -5,6 +5,7 @@ clean:
 
 install:
 	virtualenv venv && \
+		source venv/bin/activate && \
 		pip install -r requirements.txt
 
 docs: install
