@@ -20,7 +20,7 @@ from sandman2.service import Service
 from sandman2.model import db, Model
 from sandman2.admin import admin, CustomAdminView
 
-__version__ = '0.0.4'
+__version__ = '0.0.4.1'
 
 # Augment sandman2's Model class with the Automap and Flask-SQLAlchemy model
 # classes
