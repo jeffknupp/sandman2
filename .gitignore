@@ -8,3 +8,4 @@ htmlcov
 .dockerignore
 dist
 .tox
+build
