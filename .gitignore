@@ -5,3 +5,6 @@ venv
 *.egg*
 htmlcov
 .coverage
+.dockerignore
+dist
+.tox
