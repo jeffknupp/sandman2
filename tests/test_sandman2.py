@@ -196,3 +196,11 @@ def test_etag_not_modified(app):
                 },
             )
         assert response.status_code == 304
+
+
+def test_meta_endpoint(app):
+    """Can we retrieve a description of the resource from its 'meta'
+    endpoint?"""
+    with app.test_client() as client:
+        response = client.get('/artist/meta')
+        assert json.loads(response.get_data(as_text=True)) == ARTIST_META

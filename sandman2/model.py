@@ -114,3 +114,22 @@ class Model(object):
         for attribute in attributes:
             setattr(self, attribute, attributes[attribute])
         return self
+
+    @classmethod
+    def description(cls):
+        """Return a field->data type dictionary describing this model
+        as reported by the database.
+        
+        :rtype: dict
+        """
+
+        description = {}
+        for column in cls.__table__.columns:  # pylint: disable=no-member
+            column_description = str(column.type)
+            if not column.nullable:
+                column_description += ' (required)'
+            description[column.name] =  column_description
+        return description
+
+
+

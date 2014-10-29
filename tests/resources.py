@@ -36,3 +36,8 @@ NEW_ALBUM = {
     'ArtistId': 1,
     'Title': 'Some Title',
 }
+
+ARTIST_META = {
+    "ArtistId": "INTEGER (required)",
+    "Name": "NVARCHAR(120)"
+}

@@ -76,6 +76,9 @@ class Service(MethodView):
 
         :param resource_id: The value of the resource's primary key
         """
+        if 'meta' in request.path:
+            return self._meta()
+
         if resource_id is None:
             return flask.jsonify({
                 self.__json_collection_name__: self._all_resources()
@@ -140,6 +143,11 @@ class Service(MethodView):
         db.session().add(resource)
         db.session().commit()
         return self._created_response(resource)
+
+    def _meta(self):
+        """Return a description of this resource as reported by the database."""
+        return flask.jsonify(self.__model__.description())
+
 
     def _resource(self, resource_id):
         """Return the ``sandman2.model.Model`` instance with the given

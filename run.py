@@ -1,10 +1,8 @@
-from sandman2 import get_app, reflect_all
+from sandman2 import get_app
 
-app = get_app('config.settings')
+app = get_app('sqlite+pysqlite:///tests/data/db.sqlite3')
 
 def main():
-    with app.app_context():
-        reflect_all()
     app.run(debug=True)
 
 
