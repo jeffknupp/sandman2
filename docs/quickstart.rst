@@ -23,3 +23,16 @@ as API resources (If this is not the behavior desired, there are easy ways to
 configure the exact behavior of sandman2 if you're willing to write a few lines
 of code, discussed later in the documentation). The default URL for each table is
 a slash followed by the table's name in all lower case (e.g. an "Artist" table would be found at ``localhost:5000/artist``).
+
+Using Your New REST API
+-----------------------
+
+If you've successfully pointed ``sandman2ctl`` at your database, you should see
+output like the following::
+
+    $ sandman2ctl 'sqlite+pysqlite:///path/to/sqlite/database'
+     * Running on http://0.0.0.0:5000/
+
+The API service is available on port 5000 by default (though this is
+configurable). You can interact with your service using `curl` or any other HTTP
+client.
