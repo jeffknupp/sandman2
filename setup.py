@@ -64,7 +64,7 @@ setup(
             'sandman2ctl = scripts.sandman2ctl:main',
             ],
         },
-    packages=['sandman2'],
+    packages=['sandman2', 'scripts'],
     include_package_data=True,
     platforms='any',
     test_suite='tests.test_sandman2',
