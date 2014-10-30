@@ -53,6 +53,7 @@ setup(
     tests_require=['pytest', 'pytest-cov'],
     install_requires=['Flask>=0.10.1',
                       'Flask-SQLAlchemy>=1.0',
+                      'pytest-flask==0.4.0',
                       'Flask-Admin>=1.0.8',
                       ],
     cmdclass={'test': PyTest},
