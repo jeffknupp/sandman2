@@ -18,7 +18,8 @@ from sandman2.exception import (
     )
 from sandman2.service import Service
 from sandman2.model import db, Model
-from sandman2.admin import admin, CustomAdminView
+from sandman2.admin import CustomAdminView
+from flask.ext.admin import Admin
 
 __version__ = '0.0.4.1'
 
@@ -29,21 +30,32 @@ Model = declarative_base(cls=(Model, db.Model))
 AutomapModel = automap_base(Model)
 
 
-def get_app(database_uri, reflect_all=True):
+def get_app(
+        database_uri,
+        exclude_tables=None,
+        user_models=None,
+        reflect_all=True):
     """Return an application instance connected to the database described in
     *database_uri*.
 
     :param str database_uri: The URI connection string for the database
+    :param list exclude_tables: A list of tables to exclude from the API
+                                service
+    :param list user_models: A list of user-defined models to include in the
+                             API service
     :param bool reflect_all: Include all database tables in the API service
     """
-    app = Flask(__name__)
+    app = Flask('sandman2')
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
     db.init_app(app)
-    admin.init_app(app)
+    admin = Admin(app, base_template='layout.html')
     _register_error_handlers(app)
+    if user_models is not None:
+        with app.app_context():
+            _register_user_models(user_models, admin)
     if reflect_all:
         with app.app_context():
-            _reflect_all()
+            _reflect_all(exclude_tables, admin)
     return app
 
 
@@ -98,18 +110,43 @@ def register_service(cls, primary_key_type='int'):
         methods=methods - set(['POST']))
 
 
-def _reflect_all():
-    """Register all tables in the given database as services."""
+def _reflect_all(exclude_tables=None, admin=None):
+    """Register all tables in the given database as services.
+
+    :param list exclude_tables: A list of tables to exclude from the API
+                                service
+    """
     AutomapModel.prepare(  # pylint:disable=maybe-no-member
         db.engine, reflect=True)
     for cls in AutomapModel.classes:
-        cls.__url__ = '/{}'.format(cls.__name__.lower())
-        service_class = type(
-            cls.__name__ + 'Service',
-            (Service,),
-            {
-                '__model__': cls,
-                '__version__': __version__,
-            })
-        register_service(service_class)
+        if exclude_tables and cls.__table__.name in exclude_tables:
+            continue
+        register_model(cls, admin)
+
+
+def register_model(cls, admin=None):
+    """Register *cls* to be included in the API service
+
+    :param cls: Class deriving from :class:`sandman2.models.Model`
+    """
+    cls.__url__ = '/{}'.format(cls.__name__.lower())
+    service_class = type(
+        cls.__name__ + 'Service',
+        (Service,),
+        {
+            '__model__': cls,
+            '__version__': __version__,
+        })
+    register_service(service_class)
+    if admin is not None:
         admin.add_view(CustomAdminView(cls, db.session))
+
+
+def _register_user_models(user_models, admin=None):
+    """Register any user-defined models with the API Service.
+
+    :param list user_models: A list of user-defined models to include in the
+                             API service
+    """
+    for model in user_models:
+        register_model(model, admin)
