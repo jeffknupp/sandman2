@@ -7,7 +7,7 @@ import flask
 from flask.views import MethodView
 
 # Application imports
-from sandman2.exception import NotFoundException
+from sandman2.exception import NotFoundException, BadRequestException
 from sandman2.model import db
 from sandman2.decorators import etag, validate_fields
 
@@ -40,6 +40,15 @@ def jsonify(resource):
     return response
 
 
+def is_valid_method(model, resource=None):
+    """Return the error message to be sent to the client if the current
+    request passes fails any user-defined validation."""
+    validation_function_name = 'is_valid_{}'.format(
+        request.method.lower())
+    if hasattr(model, validation_function_name):
+        return getattr(model, validation_function_name)(request, resource)
+
+
 class Service(MethodView):
 
     """The *Service* class is a generic extension of Flask's *MethodView*,
@@ -63,6 +72,9 @@ class Service(MethodView):
         :param resource_id: The value of the resource's primary key
         """
         resource = self._resource(resource_id)
+        error_message = is_valid_method(self, resource)
+        if error_message:
+            raise BadRequestException(error_message)
         db.session().delete(resource)
         db.session().commit()
         return self._no_content_response()
@@ -80,11 +92,19 @@ class Service(MethodView):
             return self._meta()
 
         if resource_id is None:
+            error_message = is_valid_method(self)
+            if error_message:
+                raise BadRequestException(error_message)
+
             return flask.jsonify({
                 self.__json_collection_name__: self._all_resources()
                 })
         else:
-            return jsonify(self._resource(resource_id))
+            resource = self._resource(resource_id)
+            error_message = is_valid_method(self, resource)
+            if error_message:
+                raise BadRequestException(error_message)
+            return jsonify(resource)
 
     def patch(self, resource_id):
         """Return an HTTP response object resulting from an HTTP PATCH call.
@@ -95,6 +115,9 @@ class Service(MethodView):
         :param resource_id: The value of the resource's primary key
         """
         resource = self._resource(resource_id)
+        error_message = is_valid_method(self, resource)
+        if error_message:
+            raise BadRequestException(error_message)
         resource.update(request.json)
         db.session().merge(resource)
         db.session().commit()
@@ -111,9 +134,15 @@ class Service(MethodView):
         """
         resource = self.__model__.query.filter_by(**request.json).first()
         if resource:
+            error_message = is_valid_method(self, resource)
+            if error_message:
+                raise BadRequestException(error_message)
             return self._no_content_response()
 
         resource = self.__model__(**request.json)  # pylint: disable=not-callable
+        error_message = is_valid_method(self, resource)
+        if error_message:
+            raise BadRequestException(error_message)
         db.session().add(resource)
         db.session().commit()
         return self._created_response(resource)
@@ -134,20 +163,26 @@ class Service(MethodView):
         """
         resource = self.__model__.query.get(resource_id)
         if resource:
+            error_message = is_valid_method(self, resource)
+            if error_message:
+                raise BadRequestException(error_message)
             resource.update(request.json)
             db.session().merge(resource)
             db.session().commit()
             return jsonify(resource)
 
         resource = self.__model__(**request.json)  # pylint: disable=not-callable
+        error_message = is_valid_method(self, resource)
+        if error_message:
+            raise BadRequestException(error_message)
         db.session().add(resource)
         db.session().commit()
         return self._created_response(resource)
 
     def _meta(self):
-        """Return a description of this resource as reported by the database."""
+        """Return a description of this resource as reported by the
+        database."""
         return flask.jsonify(self.__model__.description())
-
 
     def _resource(self, resource_id):
         """Return the ``sandman2.model.Model`` instance with the given

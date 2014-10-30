@@ -128,8 +128,5 @@ class Model(object):
             column_description = str(column.type)
             if not column.nullable:
                 column_description += ' (required)'
-            description[column.name] =  column_description
+            description[column.name] = column_description
         return description
-
-
-
