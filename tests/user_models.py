@@ -1,6 +1,8 @@
 import datetime
 
-from sandman2 import db
+from sandman2.model import db
+
+from tests.resources import GET_ERROR_MESSAGE
 
 class User(db.Model):
 
@@ -40,7 +42,8 @@ class Post(db.Model):
     author = db.relationship(User)
 
     @staticmethod
-    def is_valid_get(_, resource):
-        """Return False if not given a resource (i.e. the request if for a
-        collection)."""
-        return resource is not None
+    def is_valid_get(request, resource):
+        """Return error message if not given a resource (i.e. the
+        request if for a collection)."""
+        if resource is None:
+            return GET_ERROR_MESSAGE

@@ -72,7 +72,7 @@ class Service(MethodView):
         :param resource_id: The value of the resource's primary key
         """
         resource = self._resource(resource_id)
-        error_message = is_valid_method(self, resource)
+        error_message = is_valid_method(self.__model__, resource)
         if error_message:
             raise BadRequestException(error_message)
         db.session().delete(resource)
@@ -92,7 +92,7 @@ class Service(MethodView):
             return self._meta()
 
         if resource_id is None:
-            error_message = is_valid_method(self)
+            error_message = is_valid_method(self.__model__)
             if error_message:
                 raise BadRequestException(error_message)
 
@@ -101,7 +101,7 @@ class Service(MethodView):
                 })
         else:
             resource = self._resource(resource_id)
-            error_message = is_valid_method(self, resource)
+            error_message = is_valid_method(self.__model__, resource)
             if error_message:
                 raise BadRequestException(error_message)
             return jsonify(resource)
@@ -115,7 +115,7 @@ class Service(MethodView):
         :param resource_id: The value of the resource's primary key
         """
         resource = self._resource(resource_id)
-        error_message = is_valid_method(self, resource)
+        error_message = is_valid_method(self.__model__, resource)
         if error_message:
             raise BadRequestException(error_message)
         resource.update(request.json)
@@ -134,13 +134,13 @@ class Service(MethodView):
         """
         resource = self.__model__.query.filter_by(**request.json).first()
         if resource:
-            error_message = is_valid_method(self, resource)
+            error_message = is_valid_method(self.__model__, resource)
             if error_message:
                 raise BadRequestException(error_message)
             return self._no_content_response()
 
         resource = self.__model__(**request.json)  # pylint: disable=not-callable
-        error_message = is_valid_method(self, resource)
+        error_message = is_valid_method(self.__model__, resource)
         if error_message:
             raise BadRequestException(error_message)
         db.session().add(resource)
@@ -163,7 +163,7 @@ class Service(MethodView):
         """
         resource = self.__model__.query.get(resource_id)
         if resource:
-            error_message = is_valid_method(self, resource)
+            error_message = is_valid_method(self.__model__, resource)
             if error_message:
                 raise BadRequestException(error_message)
             resource.update(request.json)
@@ -172,7 +172,7 @@ class Service(MethodView):
             return jsonify(resource)
 
         resource = self.__model__(**request.json)  # pylint: disable=not-callable
-        error_message = is_valid_method(self, resource)
+        error_message = is_valid_method(self.__model__, resource)
         if error_message:
             raise BadRequestException(error_message)
         db.session().add(resource)

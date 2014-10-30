@@ -12,37 +12,31 @@ import pytest
 from sandman2 import get_app, db
 
 
-TEST_DATABASE_PATH = os.path.join('tests', 'data', 'test_db.sqlite3')
-PRISTINE_DATABASE_PATH = os.path.join('tests', 'data', 'db.sqlite3')
-
-shutil.copy(PRISTINE_DATABASE_PATH, TEST_DATABASE_PATH)
-
 
 @pytest.yield_fixture(scope='function')
-def app():
+def app(request):
     """Yield the application instance."""
-    if os.path.exists(TEST_DATABASE_PATH):
-        os.unlink(TEST_DATABASE_PATH)
-    shutil.copy(PRISTINE_DATABASE_PATH, TEST_DATABASE_PATH)
+    database = getattr(request.module, 'database', 'db.sqlite3')
+    test_database_path = os.path.join('tests', 'data', 'test_db.sqlite3')
+    pristine_database_path = os.path.join('tests', 'data', database)
 
-    APPLICATION = get_app('sqlite+pysqlite:///tests/data/test_db.sqlite3')
-    APPLICATION.testing = True
+    shutil.copy(pristine_database_path, test_database_path)
 
-    yield APPLICATION
+    model_module = getattr(request.module, 'model_module', None)
+    user_models = []
+    if model_module:
+        module = importlib.import_module(model_module)
+        for _, obj in inspect.getmembers(module):
+            if inspect.isclass(obj):
+                user_models.append(obj)
 
-    with APPLICATION.app_context():
+    application = get_app('sqlite+pysqlite:///{}'.format(
+        test_database_path), user_models=user_models)
+    application.testing = True
+
+    yield application
+
+    with application.app_context():
         db.session.remove()
         db.drop_all()
-    os.unlink(TEST_DATABASE_PATH)
-
-
-#@pytest.yield_fixture(scope='function')
-#def user_app(request):
-#    """Yield the application instance with the given user-defined models."""
-#    model_module = getattr(request.module, 'model_module')
-#    module = importlib.import_module(model_module)
-#    user_models = []
-#    for obj in inspect.getmembers(module):
-#        if inspect.isclass(obj):
-#            user_models.append(obj)
-
+    os.unlink(test_database_path)

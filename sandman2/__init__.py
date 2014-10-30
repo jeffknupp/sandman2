@@ -25,7 +25,6 @@ __version__ = '0.0.4.1'
 
 # Augment sandman2's Model class with the Automap and Flask-SQLAlchemy model
 # classes
-SandmanModel = Model
 Model = declarative_base(cls=(Model, db.Model))
 AutomapModel = automap_base(Model)
 
@@ -50,10 +49,10 @@ def get_app(
     db.init_app(app)
     admin = Admin(app, base_template='layout.html')
     _register_error_handlers(app)
-    if user_models is not None:
+    if user_models:
         with app.app_context():
             _register_user_models(user_models, admin)
-    if reflect_all:
+    elif reflect_all:
         with app.app_context():
             _reflect_all(exclude_tables, admin)
     return app
@@ -149,4 +148,5 @@ def _register_user_models(user_models, admin=None):
                              API service
     """
     for model in user_models:
-        register_model(model, admin)
+        sandman_model = type(model.__name__, (model, Model), {})
+        register_model(sandman_model, admin)

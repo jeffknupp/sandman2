@@ -41,3 +41,5 @@ ARTIST_META = {
     "ArtistId": "INTEGER (required)",
     "Name": "NVARCHAR(120)"
 }
+
+GET_ERROR_MESSAGE = 'Not allowed to call GET on collection'
