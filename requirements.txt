@@ -6,3 +6,4 @@ WTForms==2.0.1
 coverage==3.7.1
 pytest==2.6.3
 pytest-cov==1.8.0
+pytest-flask==0.4.0
