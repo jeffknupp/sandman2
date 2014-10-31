@@ -34,7 +34,7 @@ output like the following::
      * Running on http://0.0.0.0:5000/
 
 The API service is available on port 5000 by default (though this is
-configurable). You can interact with your service using `curl` or any other HTTP
+configurable). You can interact with your service using ``curl`` or any other HTTP
 client.
 
 .. _RFC-1738-style: http://rfc.net/rfc1738.html

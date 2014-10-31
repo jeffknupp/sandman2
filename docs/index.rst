@@ -12,6 +12,7 @@ Contents:
    :maxdepth: 2
 
    Quickstart <quickstart>
+   Interacting With Your sandman2 API <interacting>
    API <sandman2>
 
 
