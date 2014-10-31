@@ -201,7 +201,11 @@ class Service(MethodView):
 
         :rtype: :class:`sandman2.model.Model`
         """
-        resources = self.__model__.query.all()
+        if 'page' in request.args:
+            resources = self.__model__.query.paginate(
+                int(request.args['page'])).items
+        else:
+            resources = self.__model__.query.all()
         return [r.to_dict() for r in resources]
 
     @staticmethod
