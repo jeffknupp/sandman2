@@ -9,3 +9,4 @@ htmlcov
 dist
 .tox
 build
+*.bak
