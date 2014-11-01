@@ -2,7 +2,10 @@ import datetime
 
 from sandman2.model import db
 
-from tests.resources import GET_ERROR_MESSAGE
+from tests.resources import (
+    GET_ERROR_MESSAGE,
+    INVALID_ACTION_MESSAGE,
+    )
 
 class User(db.Model):
 
@@ -13,6 +16,31 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
     email = db.Column(db.String, unique=True)
+
+    @staticmethod
+    def is_valid_get(request, resource):
+        """Return error message in all cases (just for testing)."""
+        return INVALID_ACTION_MESSAGE
+
+    @staticmethod
+    def is_valid_post(request, resource):
+        """Return error message in all cases (just for testing)."""
+        return INVALID_ACTION_MESSAGE
+
+    @staticmethod
+    def is_valid_patch(request, resource):
+        """Return error message in all cases (just for testing)."""
+        return INVALID_ACTION_MESSAGE
+
+    @staticmethod
+    def is_valid_put(request, resource):
+        """Return error message in all cases (just for testing)."""
+        return INVALID_ACTION_MESSAGE
+
+    @staticmethod
+    def is_valid_delete(request, resource):
+        """Return error message in all cases (just for testing)."""
+        return INVALID_ACTION_MESSAGE
 
 
 class Blog(db.Model):
@@ -40,10 +68,3 @@ class Post(db.Model):
     posted_at = db.Column(db.DateTime, default=datetime.datetime.now)
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     author = db.relationship(User)
-
-    @staticmethod
-    def is_valid_get(request, resource):
-        """Return error message if not given a resource (i.e. the
-        request if for a collection)."""
-        if resource is None:
-            return GET_ERROR_MESSAGE

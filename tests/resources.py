@@ -43,3 +43,5 @@ ARTIST_META = {
 }
 
 GET_ERROR_MESSAGE = 'Not allowed to call GET on collection'
+
+INVALID_ACTION_MESSAGE = 'Invalid action'

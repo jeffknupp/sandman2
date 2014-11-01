@@ -17,6 +17,7 @@ from sandman2 import get_app, db
 def app(request):
     """Yield the application instance."""
     database = getattr(request.module, 'database', 'db.sqlite3')
+    exclude_tables = getattr(request.module, 'exclude_tables', None)
     test_database_path = os.path.join('tests', 'data', 'test_db.sqlite3')
     pristine_database_path = os.path.join('tests', 'data', database)
 
@@ -30,8 +31,11 @@ def app(request):
             if inspect.isclass(obj):
                 user_models.append(obj)
 
-    application = get_app('sqlite+pysqlite:///{}'.format(
-        test_database_path), user_models=user_models)
+    application = get_app(
+        'sqlite+pysqlite:///{}'.format(
+            test_database_path),
+        user_models=user_models,
+        exclude_tables=exclude_tables)
     application.testing = True
 
     yield application
