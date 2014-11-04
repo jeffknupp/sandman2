@@ -49,11 +49,12 @@ def get_app(
     db.init_app(app)
     admin = Admin(app, base_template='layout.html')
     _register_error_handlers(app)
-    if user_models:
-        with app.app_context():
+    with app.app_context():
+        AutomapModel.prepare(  # pylint:disable=maybe-no-member
+            db.engine, reflect=True)
+        if user_models:
             _register_user_models(user_models, admin)
-    elif reflect_all:
-        with app.app_context():
+        if reflect_all:
             _reflect_all(exclude_tables, admin)
     return app
 
@@ -115,8 +116,6 @@ def _reflect_all(exclude_tables=None, admin=None):
     :param list exclude_tables: A list of tables to exclude from the API
                                 service
     """
-    AutomapModel.prepare(  # pylint:disable=maybe-no-member
-        db.engine, reflect=True)
     for cls in AutomapModel.classes:
         if exclude_tables and cls.__table__.name in exclude_tables:
             continue
@@ -148,5 +147,4 @@ def _register_user_models(user_models, admin=None):
                              API service
     """
     for model in user_models:
-        sandman_model = type(model.__name__, (model, Model), {})
-        register_model(sandman_model, admin)
+        register_model(model, admin)
