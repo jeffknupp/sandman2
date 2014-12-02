@@ -54,7 +54,7 @@ def get_app(
             db.engine, reflect=True)
         if user_models:
             _register_user_models(user_models, admin)
-        if reflect_all:
+        elif reflect_all:
             _reflect_all(exclude_tables, admin)
     return app
 
@@ -147,4 +147,5 @@ def _register_user_models(user_models, admin=None):
                              API service
     """
     for model in user_models:
-        register_model(model, admin)
+        sandman_model = type(model.__name__, (model, Model), {})
+        register_model(sandman_model, admin)
