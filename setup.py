@@ -71,6 +71,7 @@ setup(
     platforms='any',
     test_suite='tests.test_sandman2',
     zip_safe=False,
+    package_data={'sandman2': ['templates/**.html']},
     classifiers=[
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
