@@ -9,7 +9,6 @@ from flask.ext.sqlalchemy import SQLAlchemy  # pylint: disable=import-error,no-n
 
 db = SQLAlchemy()
 
-
 class Model(object):
 
     """The sandman2 Model class is the base class for all RESTful resources.

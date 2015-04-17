@@ -147,6 +147,13 @@ def _register_user_models(user_models, admin=None):
     :param list user_models: A list of user-defined models to include in the
                              API service
     """
-    for model in user_models:
-        sandman_model = type(model.__name__, (model, Model), {})
-        register_model(sandman_model, admin)
+    if any([True for cls in user_models if issubclass(cls, AutomapModel)]):
+        AutomapModel.prepare(  # pylint:disable=maybe-no-member
+                               db.engine, reflect=True)
+
+    for user_model in user_models:
+        if not issubclass(user_model, AutomapModel):
+            model_type = type(user_model.__name__, (user_model, Model), {})
+            register_model(model_type, admin)
+        else:
+            register_model(user_model, admin)

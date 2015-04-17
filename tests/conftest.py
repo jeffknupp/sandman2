@@ -27,9 +27,10 @@ def app(request):
     user_models = []
     if model_module:
         module = importlib.import_module(model_module)
-        for _, obj in inspect.getmembers(module):
+        for name, obj in inspect.getmembers(module):
             if inspect.isclass(obj):
-                user_models.append(obj)
+                if name != 'AutomapModel':
+                    user_models.append(obj)
 
     application = get_app(
         'sqlite+pysqlite:///{}'.format(
