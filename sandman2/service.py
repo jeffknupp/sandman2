@@ -205,7 +205,22 @@ class Service(MethodView):
             resources = self.__model__.query.paginate(
                 int(request.args['page'])).items
         else:
-            resources = self.__model__.query.all()
+            if request.args:
+                filters = []
+                order = []
+                limit = None
+                for key, value in request.args.items():
+                    if value.startswith('%'):
+                        filters.append(getattr(self.__model__, key).like(str(value), escape='/'))
+                    elif key == 'sort':
+                        order.append(getattr(self.__model__, value))
+                    elif key == 'limit':
+                        limit = value
+                    elif key:
+                        filters.append(getattr(self.__model__, key) == value)
+                resources = self.__model__.query.filter(*filters).order_by(*order).limit(limit)
+            else:
+                resources = self.__model__.query.all()
         return [r.to_dict() for r in resources]
 
     @staticmethod
