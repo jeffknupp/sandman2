@@ -1,7 +1,10 @@
 """Tests for sandman2."""
-import json
 import os
 import sys
+import json
+import datetime
+
+from dateutil.parser import parse as parse_date
 
 sys.path.insert(0, os.path.abspath('.'))
 
@@ -19,15 +22,76 @@ def test_get_resource(client):
     assert response.headers['ETag'] in RESOURCE_ETAGS
 
 
-def test_get_collection(client):
-    """Can we GET a collection of resources properly?"""
-    response = client.get('/artist')
-    assert response.status_code == 200
-    json_response = json.loads(
-        response.get_data(as_text=True))['resources']
-    assert len(json_response) == 275
-    assert response.headers['Content-type'] == 'application/json'
-    assert response.headers['ETag'] in COLLECTION_ETAGS
+class TestGetCollection:
+
+    def test_get(self, client):
+        """Can we GET a collection of resources properly?"""
+        response = client.get('/artist')
+        assert response.status_code == 200
+        json_response = json.loads(
+            response.get_data(as_text=True))['resources']
+        assert len(json_response) == 275
+        assert response.headers['Content-type'] == 'application/json'
+        assert response.headers['ETag'] in COLLECTION_ETAGS
+
+    def test_get_query_bad_column(self, client):
+        response = client.get('/artist', query_string='MissingColumn=5')
+        data = json.loads(response.get_data(as_text=True))
+        assert response.status_code == 400
+        assert data['message'] == 'Invalid parameter "MissingColumn"'
+
+    def test_get_query_bad_value(self, client):
+        response = client.get('/artist', query_string='ArtistId=five')
+        data = json.loads(response.get_data(as_text=True))
+        assert response.status_code == 400
+        assert data['message'] == 'Invalid value "five" on field "ArtistId"'
+
+    def test_get_query_bad_key(self, client):
+        response = client.get('/artist', query_string='Name__invalid__operator=5')
+        data = json.loads(response.get_data(as_text=True))
+        assert response.status_code == 400
+        assert data['message'] == 'Invalid parameter "Name__invalid__operator"'
+
+    def test_get_query_bad_operator(self, client):
+        response = client.get('/artist', query_string='Name__missing_operator=5')
+        data = json.loads(response.get_data(as_text=True))
+        assert response.status_code == 400
+        assert data['message'] == 'Invalid operator "missing_operator"'
+
+    def test_get_query_equals_string(self, client):
+        response = client.get('/artist?Name=AC/DC')
+        assert response.status_code == 200
+        data = json.loads(response.get_data(as_text=True))
+        assert len(data['resources']) == 1
+        assert data['resources'][0]['Name'] == 'AC/DC'
+
+    def test_get_query_greater(self, client):
+        response = client.get('/artist?ArtistId__gt=5')
+        assert response.status_code == 200
+        data = json.loads(response.get_data(as_text=True))
+        assert all([each['ArtistId'] > 5 for each in data['resources']])
+
+    def test_get_query_less(self, client):
+        response = client.get('/invoice?InvoiceDate__lt=2011-01-01')
+        assert response.status_code == 200
+        data = json.loads(response.get_data(as_text=True))
+        date = datetime.datetime(2011, 1, 1)
+        assert all([
+            parse_date(each['InvoiceDate'], ignoretz=True) < date
+            for each in data['resources']
+        ])
+
+    def test_get_query_like_bad_column(self, client):
+        response = client.get('/artist?ArtistId__like=AC%')
+        data = json.loads(response.get_data(as_text=True))
+        assert response.status_code == 400
+        assert data['message'] == 'Invalid operator "like" on field "ArtistId"'
+
+    def test_get_query_like(self, client):
+        response = client.get('/artist?Name__like=AC%')
+        assert response.status_code == 200
+        data = json.loads(response.get_data(as_text=True))
+        assert all([each['Name'].lower().startswith('ac') for each in data['resources']])
 
 
 def test_post(client):

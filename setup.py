@@ -56,6 +56,8 @@ setup(
         'Flask-SQLAlchemy>=1.0',
         'pytest-flask==0.4.0',
         'Flask-Admin>=1.0.8',
+        'python-dateutil>=2.4.2',
+        'six>=1.9.0',
         ],
     cmdclass={'test': PyTest},
     author_email='jeff@jeffknupp.com',

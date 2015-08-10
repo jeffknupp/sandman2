@@ -10,6 +10,10 @@ from flask.views import MethodView
 from sandman2.exception import NotFoundException, BadRequestException
 from sandman2.model import db
 from sandman2.decorators import etag, validate_fields
+from sandman2 import operators
+
+
+RESERVED_PARAMETERS = ['page', 'sort']
 
 
 def add_link_headers(response, links):
@@ -26,6 +30,14 @@ def add_link_headers(response, links):
         link_string += ', <{}>; rel=related'.format(link)
     response.headers['Link'] = link_string
     return response
+
+
+def filter_query(model, query, params):
+    for key, value in params:
+        if key in RESERVED_PARAMETERS:
+            continue
+        query = query.filter(operators.filter(model, key, value))
+    return query
 
 
 def jsonify(resource):
@@ -201,12 +213,13 @@ class Service(MethodView):
 
         :rtype: :class:`sandman2.model.Model`
         """
+        query = self.__model__.query
+        query = filter_query(self.__model__, query, request.args.items(multi=True))
         if 'page' in request.args:
-            resources = self.__model__.query.paginate(
-                int(request.args['page'])).items
+            query = query.paginate(int(request.args['page'])).items
         else:
-            resources = self.__model__.query.all()
-        return [r.to_dict() for r in resources]
+            query = query.all()
+        return [r.to_dict() for r in query]
 
     @staticmethod
     def _no_content_response():
