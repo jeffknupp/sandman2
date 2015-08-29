@@ -95,8 +95,8 @@ operators = {
     'like': Like(),
 }
 
-def parse_operator(key):
-    parts = key.split('__')
+def parse_operator(key, delimiter):
+    parts = key.split(delimiter)
     if len(parts) == 1:
         return parts[0], 'eq'
     elif len(parts) == 2:
@@ -104,7 +104,8 @@ def parse_operator(key):
     raise exception.BadRequestException('Invalid parameter "{0}"'.format(key))
 
 def filter(model, key, values):
-    column_name, operator_name = parse_operator(key)
+    delimiter = current_app.config.get('QUERY_DELIMITER', '__')
+    column_name, operator_name = parse_operator(key, delimiter)
     column = utils.get_column(model, column_name)
     try:
         operator = operators[operator_name]

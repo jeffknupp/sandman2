@@ -87,6 +87,14 @@ class TestGetCollection:
         assert len(data['resources']) == 274
         assert not any(each['Name'] == 'AC/DC' for each in data['resources'])
 
+    def test_get_query_not_equals_custom_delimiter(self, client):
+        client.application.config['QUERY_DELIMITER'] = '::'
+        response = client.get('/artist?Name::ne=AC/DC')
+        assert response.status_code == 200
+        data = json.loads(response.get_data(as_text=True))
+        assert len(data['resources']) == 274
+        assert not any(each['Name'] == 'AC/DC' for each in data['resources'])
+
     def test_get_query_not_equals_multiple(self, client):
         response = client.get('/artist?Name__ne=AC/DC&Name__ne=Aerosmith')
         assert response.status_code == 200
