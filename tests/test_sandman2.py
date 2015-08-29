@@ -65,6 +65,13 @@ class TestGetCollection:
         assert len(data['resources']) == 1
         assert data['resources'][0]['Name'] == 'AC/DC'
 
+    def test_get_query_equals_string_multiple(self, client):
+        response = client.get('/artist?Name=AC/DC&Name=Aerosmith')
+        assert response.status_code == 200
+        data = json.loads(response.get_data(as_text=True))
+        assert len(data['resources']) == 2
+        assert {'AC/DC', 'Aerosmith'} == set(each['Name'] for each in data['resources'])
+
     def test_get_query_not_equals(self, client):
         response = client.get('/artist?Name__ne=AC/DC')
         assert response.status_code == 200
@@ -72,11 +79,24 @@ class TestGetCollection:
         assert len(data['resources']) == 274
         assert not any(each['Name'] == 'AC/DC' for each in data['resources'])
 
+    def test_get_query_not_equals_multiple(self, client):
+        response = client.get('/artist?Name__ne=AC/DC&Name__ne=Aerosmith')
+        assert response.status_code == 200
+        data = json.loads(response.get_data(as_text=True))
+        assert len(data['resources']) == 273
+        assert not any(each['Name'] in ['AC/DC', 'Aerosmith'] for each in data['resources'])
+
     def test_get_query_greater(self, client):
         response = client.get('/artist?ArtistId__gt=5')
         assert response.status_code == 200
         data = json.loads(response.get_data(as_text=True))
         assert all([each['ArtistId'] > 5 for each in data['resources']])
+
+    def test_get_query_greater_multiple(self, client):
+        response = client.get('/artist?ArtistId__gt=5&ArtistId__gt=7')
+        assert response.status_code == 200
+        data = json.loads(response.get_data(as_text=True))
+        assert all([each['ArtistId'] > 7 for each in data['resources']])
 
     def test_get_query_less(self, client):
         response = client.get('/invoice?InvoiceDate__lt=2011-01-01')
@@ -99,6 +119,16 @@ class TestGetCollection:
         assert response.status_code == 200
         data = json.loads(response.get_data(as_text=True))
         assert all([each['Name'].lower().startswith('ac') for each in data['resources']])
+
+    def test_get_query_like_multiple(self, client):
+        response = client.get('/artist?Name__like=AC%&Name__like=Aero%')
+        assert response.status_code == 200
+        data = json.loads(response.get_data(as_text=True))
+        assert all([
+            each['Name'].lower().startswith('ac') or
+            each['Name'].lower().startswith('aero')
+            for each in data['resources']
+        ])
 
 
 def test_post(client):

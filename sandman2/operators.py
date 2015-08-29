@@ -22,9 +22,10 @@ def default_converter(column, value):
 
 class Operator(object):
 
-    def __call__(self, column, value):
-        self.validate(column, value)
-        return self.filter(column, self.convert(column, value))
+    def __call__(self, column, values):
+        self.validate(column, values)
+        converted = [self.convert(column, value) for value in values]
+        return self.filter(column, converted)
 
     def convert(self, column, value):
         converter = converters.get(utils.column_type(column), default_converter)
@@ -33,55 +34,56 @@ class Operator(object):
         except Exception as error:
             raise exception.BadRequestException('Invalid value "{0}" on field "{1}"'.format(value, column.key))
 
-    def validate(self, column, value):
+    def validate(self, column, values):
         pass
 
-    def filter(self, column, value):
+    def filter(self, column, values):
         pass
 
 class Equal(Operator):
 
-    def filter(self, column, value):
+    def filter(self, column, values):
         if current_app.config.get('CASE_INSENSITIVE') and issubclass(utils.column_type(column), six.string_types):
-            return sa.func.upper(column) == value.upper()
-        return column == value
+            return sa.func.upper(column).in_([value.upper() for value in values])
+        return column.in_(values)
 
 class NotEqual(Operator):
 
-    def filter(self, column, value):
+    def filter(self, column, values):
         if current_app.config.get('CASE_INSENSITIVE') and issubclass(utils.column_type(column), six.string_types):
-            return sa.func.upper(column) != value.upper()
-        return column != value
+            return ~sa.func.upper(column).in_([value.upper() for value in values])
+        return ~column.in_(values)
 
 class Like(Operator):
 
-    def validate(self, column, value):
+    def validate(self, column, values):
         if not issubclass(utils.column_type(column), six.string_types):
             raise exception.BadRequestException('Invalid operator "like" on field "{0}"'.format(column.key))
 
-    def filter(self, column, value):
+    def filter(self, column, values):
         attr = 'ilike' if current_app.config.get('CASE_INSENSITIVE') else 'like'
-        return getattr(column, attr)(value)
+        method = getattr(column, attr)
+        return sa.and_(*[method(value) for value in values])
 
 class GreaterThan(Operator):
 
-    def filter(self, column, value):
-        return column > value
+    def filter(self, column, values):
+        return column > max(values)
 
 class GreaterEqual(Operator):
 
-    def filter(self, column, value):
-        return column >= value
+    def filter(self, column, values):
+        return column >= max(values)
 
 class LessThan(Operator):
 
-    def filter(self, column, value):
-        return column < value
+    def filter(self, column, values):
+        return column < min(values)
 
 class LessEqual(Operator):
 
-    def filter(self, column, value):
-        return column < value
+    def filter(self, column, values):
+        return column < min(values)
 
 operators = {
     'eq': Equal(),
@@ -101,11 +103,11 @@ def parse_operator(key):
         return parts
     raise exception.BadRequestException('Invalid parameter "{0}"'.format(key))
 
-def filter(model, key, value):
+def filter(model, key, values):
     column_name, operator_name = parse_operator(key)
     column = utils.get_column(model, column_name)
     try:
         operator = operators[operator_name]
     except KeyError:
         raise exception.BadRequestException('Invalid operator "{0}"'.format(operator_name))
-    return operator(column, value)
+    return operator(column, values)

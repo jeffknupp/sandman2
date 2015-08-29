@@ -33,10 +33,10 @@ def add_link_headers(response, links):
 
 
 def filter_query(model, query, params):
-    for key, value in params:
-        if key in RESERVED_PARAMETERS:
+    for param in params:
+        if param in RESERVED_PARAMETERS:
             continue
-        query = query.filter(operators.filter(model, key, value))
+        query = query.filter(operators.filter(model, param, params.getlist(param)))
     return query
 
 
@@ -214,7 +214,7 @@ class Service(MethodView):
         :rtype: :class:`sandman2.model.Model`
         """
         query = self.__model__.query
-        query = filter_query(self.__model__, query, request.args.items(multi=True))
+        query = filter_query(self.__model__, query, request.args)
         if 'page' in request.args:
             query = query.paginate(int(request.args['page'])).items
         else:
