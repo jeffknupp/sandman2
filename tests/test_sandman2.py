@@ -65,6 +65,14 @@ class TestGetCollection:
         assert len(data['resources']) == 1
         assert data['resources'][0]['Name'] == 'AC/DC'
 
+    def test_get_query_equals_string_case_insensitive(self, client):
+        client.application.config['CASE_INSENSITIVE'] = True
+        response = client.get('/artist?Name=ac/dc')
+        assert response.status_code == 200
+        data = json.loads(response.get_data(as_text=True))
+        assert len(data['resources']) == 1
+        assert data['resources'][0]['Name'] == 'AC/DC'
+
     def test_get_query_equals_string_multiple(self, client):
         response = client.get('/artist?Name=AC/DC&Name=Aerosmith')
         assert response.status_code == 200
