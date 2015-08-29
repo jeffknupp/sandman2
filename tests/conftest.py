@@ -8,9 +8,9 @@ import sys
 sys.path.insert(0, os.path.abspath('.'))
 
 import pytest
+from webtest import TestApp
 
 from sandman2 import get_app, db
-
 
 
 @pytest.yield_fixture(scope='function')
@@ -39,9 +39,15 @@ def app(request):
         exclude_tables=exclude_tables)
     application.testing = True
 
-    yield application
+    with application.test_request_context():
+        yield application
 
     with application.app_context():
         db.session.remove()
         db.drop_all()
     os.unlink(test_database_path)
+
+
+@pytest.fixture
+def client(app):
+    return TestApp(app)
