@@ -46,6 +46,13 @@ class Equal(Operator):
             return sa.func.upper(column) == value.upper()
         return column == value
 
+class NotEqual(Operator):
+
+    def filter(self, column, value):
+        if current_app.config.get('CASE_INSENSITIVE') and issubclass(utils.column_type(column), six.string_types):
+            return sa.func.upper(column) != value.upper()
+        return column != value
+
 class Like(Operator):
 
     def validate(self, column, value):
@@ -78,6 +85,7 @@ class LessEqual(Operator):
 
 operators = {
     'eq': Equal(),
+    'ne': NotEqual(),
     'gt': GreaterThan(),
     'gte': GreaterEqual(),
     'lt': LessThan(),

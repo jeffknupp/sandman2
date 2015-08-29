@@ -65,6 +65,13 @@ class TestGetCollection:
         assert len(data['resources']) == 1
         assert data['resources'][0]['Name'] == 'AC/DC'
 
+    def test_get_query_not_equals(self, client):
+        response = client.get('/artist?Name__ne=AC/DC')
+        assert response.status_code == 200
+        data = json.loads(response.get_data(as_text=True))
+        assert len(data['resources']) == 274
+        assert not any(each['Name'] == 'AC/DC' for each in data['resources'])
+
     def test_get_query_greater(self, client):
         response = client.get('/artist?ArtistId__gt=5')
         assert response.status_code == 200
