@@ -10,6 +10,10 @@ from flask.views import MethodView
 from sandman2.exception import NotFoundException, BadRequestException
 from sandman2.model import db
 from sandman2.decorators import etag, validate_fields
+from sandman2 import utils, operators
+
+
+RESERVED_PARAMETERS = ['page', 'sort']
 
 
 def add_link_headers(response, links):
@@ -26,6 +30,21 @@ def add_link_headers(response, links):
         link_string += ', <{}>; rel=related'.format(link)
     response.headers['Link'] = link_string
     return response
+
+
+def filter_query(model, query, params):
+    for param in params:
+        if param in RESERVED_PARAMETERS:
+            continue
+        query = query.filter(operators.filter(model, param, params.getlist(param)))
+    return query
+
+
+def order_query(model, query, params):
+    return query.order_by(*[
+        utils.get_order(model, key)
+        for key in params.getlist('sort')
+    ])
 
 
 def jsonify(resource):
@@ -201,12 +220,14 @@ class Service(MethodView):
 
         :rtype: :class:`sandman2.model.Model`
         """
+        query = self.__model__.query
+        query = filter_query(self.__model__, query, request.args)
+        query = order_query(self.__model__, query, request.args)
         if 'page' in request.args:
-            resources = self.__model__.query.paginate(
-                int(request.args['page'])).items
+            query = query.paginate(int(request.args['page'])).items
         else:
-            resources = self.__model__.query.all()
-        return [r.to_dict() for r in resources]
+            query = query.all()
+        return [r.to_dict() for r in query]
 
     @staticmethod
     def _no_content_response():
