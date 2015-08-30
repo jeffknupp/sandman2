@@ -7,3 +7,6 @@ coverage==3.7.1
 pytest==2.6.3
 pytest-cov==1.8.0
 pytest-flask==0.4.0
+
+git+https://github.com/marshmallow-code/smore@dev
+git+https://github.com/marshmallow-code/marshmallow-sqlalchemy@dev
