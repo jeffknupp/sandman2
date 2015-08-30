@@ -10,7 +10,7 @@ Retrieve all records in a table
 -------------------------------
 
 In REST-terms, a table in your database represents a ``resource``. A *group* of
-resources (like what would be returned from a ``SELECT * FROM foo`` statement)
+resources (i.e. data returned from a ``SELECT * FROM foo`` statement)
 is called a ``collection``. To retrieve a ``collection`` of resources from your
 API, make a HTTP ``GET`` call to the resource's base URL. By default, this is
 set to ``/<table_name_in_lowercase>``. If you had an ``Artist`` table in your
