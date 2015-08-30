@@ -13,7 +13,6 @@ from tests.resources import *  # noqa
 def test_get_resource(client):
     """Can we GET a resource properly?"""
     res = client.get('/track/1')
-    assert res.status_code == 200
     assert '</track/1>; rel=self' in res.headers['Link']
     assert res.json == TRACK_ONE
     assert res.headers['Content-type'] == 'application/json'
@@ -25,7 +24,6 @@ class TestGetCollection:
     def test_get(self, client):
         """Can we GET a collection of resources properly?"""
         res = client.get('/artist')
-        assert res.status_code == 200
         assert len(res.json['resources']) == 275
         assert res.headers['Content-type'] == 'application/json'
         assert res.headers['ETag'] in COLLECTION_ETAGS
@@ -52,55 +50,46 @@ class TestGetCollection:
 
     def test_get_query_equals_string(self, client):
         res = client.get('/artist', {'Name': 'AC/DC'})
-        assert res.status_code == 200
         assert len(res.json['resources']) == 1
         assert res.json['resources'][0]['Name'] == 'AC/DC'
 
     def test_get_query_equals_string_case_insensitive(self, client):
         client.app.config['CASE_INSENSITIVE'] = True
         res = client.get('/artist', {'Name': 'ac/dc'})
-        assert res.status_code == 200
         assert len(res.json['resources']) == 1
         assert res.json['resources'][0]['Name'] == 'AC/DC'
 
     def test_get_query_equals_string_multiple(self, client):
         res = client.get('/artist?Name=AC/DC&Name=Aerosmith')
-        assert res.status_code == 200
         assert len(res.json['resources']) == 2
         assert {'AC/DC', 'Aerosmith'} == set(each['Name'] for each in res.json['resources'])
 
     def test_get_query_not_equals(self, client):
         res = client.get('/artist?Name__ne=AC/DC')
-        assert res.status_code == 200
         assert len(res.json['resources']) == 274
         assert not any(each['Name'] == 'AC/DC' for each in res.json['resources'])
 
     def test_get_query_not_equals_custom_delimiter(self, client):
         client.app.config['QUERY_DELIMITER'] = '::'
         res = client.get('/artist', {'Name::ne': 'AC/DC'})
-        assert res.status_code == 200
         assert len(res.json['resources']) == 274
         assert not any(each['Name'] == 'AC/DC' for each in res.json['resources'])
 
     def test_get_query_not_equals_multiple(self, client):
         res = client.get('/artist', {'Name__ne': ['AC/DC', 'Aerosmith']})
-        assert res.status_code == 200
         assert len(res.json['resources']) == 273
         assert not any(each['Name'] in ['AC/DC', 'Aerosmith'] for each in res.json['resources'])
 
     def test_get_query_greater(self, client):
         res = client.get('/artist', {'ArtistId__gt': '5'})
-        assert res.status_code == 200
         assert all([each['ArtistId'] > 5 for each in res.json['resources']])
 
     def test_get_query_greater_multiple(self, client):
         res = client.get('/artist', {'ArtistId__gt': ['5', '7']})
-        assert res.status_code == 200
         assert all([each['ArtistId'] > 7 for each in res.json['resources']])
 
     def test_get_query_less(self, client):
         res = client.get('/invoice', {'InvoiceDate__lt': '2011-01-01'})
-        assert res.status_code == 200
         date = datetime.datetime(2011, 1, 1)
         assert all([
             parse_date(each['InvoiceDate'], ignoretz=True) < date
@@ -114,18 +103,30 @@ class TestGetCollection:
 
     def test_get_query_like(self, client):
         res = client.get('/artist', {'Name__like': 'AC%'})
-        assert res.status_code == 200
         assert all([each['Name'].lower().startswith('ac') for each in res.json['resources']])
 
     def test_get_query_like_multiple(self, client):
-        res = client.get('/artist?Name__like=AC%&Name__like=Aero%')
         res = client.get('/artist', {'Name__like': ['AC%', 'Aero%']})
-        assert res.status_code == 200
         assert all([
             each['Name'].lower().startswith('ac') or
             each['Name'].lower().startswith('aero')
             for each in res.json['resources']
         ])
+
+    def test_get_query_sort(self, client):
+        res = client.get('/track', {'sort': 'Name'})
+        resources = res.json['resources']
+        assert resources == sorted(resources, key=lambda r: r['Name'])
+
+    def test_get_query_sort_multiple(self, client):
+        res = client.get('/track', {'sort': ['Name', 'Milliseconds']})
+        resources = res.json['resources']
+        assert resources == sorted(resources, key=lambda r: (r['Name'], r['Milliseconds']))
+
+    def test_get_query_sort_descending(self, client):
+        res = client.get('/track', {'sort': '-Name'})
+        resources = res.json['resources']
+        assert resources == sorted(resources, key=lambda r: r['Name'], reverse=True)
 
 
 def test_post(client):
@@ -157,7 +158,6 @@ def test_post_existing(client):
 def test_put_existing(client):
     """Can we PUT a resource at a specific ID?"""
     res = client.put_json('/artist/1', REPLACED_ARTIST)
-    assert res.status_code == 200
     assert res.json == REPLACED_ARTIST
 
 
@@ -180,8 +180,7 @@ def test_delete(client):
 
 def test_patch(client):
     """Can we PATCH an existing resource?"""
-    res = client.patch_json('/artist/1', {'Name': 'Jeff Knupp'})
-    assert res.status_code == 200
+    client.patch_json('/artist/1', {'Name': 'Jeff Knupp'})
 
 
 def test_post_no_data(client):
