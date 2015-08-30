@@ -18,6 +18,7 @@ from sandman2.exception import (
     )
 from sandman2.service import Service
 from sandman2.model import db, Model
+from sandman2.swagger import make_spec
 from sandman2.admin import CustomAdminView
 from flask.ext.admin import Admin
 
@@ -48,6 +49,7 @@ def get_app(
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
     db.init_app(app)
     admin = Admin(app, base_template='layout.html')
+    _register_swagger_spec(app)
     _register_error_handlers(app)
     if user_models:
         with app.app_context():
@@ -55,7 +57,14 @@ def get_app(
     elif reflect_all:
         with app.app_context():
             _reflect_all(exclude_tables, admin)
+    app.__apispec__ = make_spec(app)
     return app
+
+
+def _register_swagger_spec(app):
+    @app.route('/', methods=['GET'])
+    def swagger_spec():
+        return jsonify(app.__apispec__.to_dict())
 
 
 def _register_error_handlers(app):
@@ -88,6 +97,8 @@ def register_service(cls, primary_key_type='int'):
     """
     view_func = cls.as_view(cls.__name__.lower())  # pylint: disable=no-member
     methods = set(cls.__model__.__methods__)  # pylint: disable=no-member
+    current_app.__services__ = getattr(current_app, '__services__', set())
+    current_app.__services__.add(cls)
 
     if 'GET' in methods:  # pylint: disable=no-member
         current_app.add_url_rule(

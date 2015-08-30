@@ -10,7 +10,7 @@ from flask.views import MethodView
 from sandman2.exception import NotFoundException, BadRequestException
 from sandman2.model import db
 from sandman2.decorators import etag, validate_fields
-from sandman2 import operators
+from sandman2 import utils, operators
 
 
 RESERVED_PARAMETERS = ['page', 'sort']
@@ -38,6 +38,13 @@ def filter_query(model, query, params):
             continue
         query = query.filter(operators.filter(model, param, params.getlist(param)))
     return query
+
+
+def order_query(model, query, params):
+    return query.order_by(*[
+        utils.get_order(model, key)
+        for key in params.getlist('sort')
+    ])
 
 
 def jsonify(resource):
@@ -215,6 +222,7 @@ class Service(MethodView):
         """
         query = self.__model__.query
         query = filter_query(self.__model__, query, request.args)
+        query = order_query(self.__model__, query, request.args)
         if 'page' in request.args:
             query = query.paginate(int(request.args['page'])).items
         else:
