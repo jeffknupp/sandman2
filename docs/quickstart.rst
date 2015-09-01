@@ -11,7 +11,7 @@ The easiest way to install sandman2 is using ``pip``::
 ``sandman2ctl``
 ---------------
 
-Once installed, sandman2 provides a command-line script, ``sandman2ctl``, that
+Once installed, sandman2 provides a command-line utility, ``sandman2ctl``, that
 takes your database's URL as a command-line argument and starts a RESTful API
 server immediately. Database URLs are RFC-1738-style_ <http://rfc.net/rfc1738.html_ URLs.
 For more information, please read the `SQLAlchemy documentation`_ <http://docs.sqlalchemy.org/en/latest/core/engines.html#database-urls>`_ on the matter.
@@ -19,10 +19,10 @@ For more information, please read the `SQLAlchemy documentation`_ <http://docs.s
 **Note:** When using **SQLite**, use ``pysqlite`` as the driver name (i.e.  ``sqlite+pysqlite:///relative/path/to/db``). 
 
 By default, all database tables will be introspected and made available
-as API resources (If this is not the behavior desired, there are easy ways to
-configure the exact behavior of sandman2 if you're willing to write a few lines
-of code, discussed later in the documentation). The default URL for each table is
-a slash followed by the table's name in all lower case (e.g. an "Artist" table would be found at ``localhost:5000/artist``).
+as API resources (don't worry if this is not the behavior desired; there are easy ways to
+configure the exact behavior of ``sandman2``, discussed later in the documentation).
+The default URL for each table is a slash followed by the table's name in all 
+lower case (e.g. an "Artist" table would be found at ``localhost:5000/artist``).
 
 Using Your New REST API
 -----------------------
