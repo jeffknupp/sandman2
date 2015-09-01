@@ -31,7 +31,7 @@ class Operator(object):
         converter = converters.get(utils.column_type(column), default_converter)
         try:
             return converter(column, value)
-        except Exception as error:
+        except Exception:
             raise exception.BadRequestException('Invalid value "{0}" on field "{1}"'.format(value, column.key))
 
     def validate(self, column, values):

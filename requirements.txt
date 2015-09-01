@@ -13,3 +13,4 @@ six=>1.9.0
 
 git+https://github.com/marshmallow-code/smore@dev
 git+https://github.com/marshmallow-code/marshmallow-sqlalchemy@dev
+git+https://github.com/jmcarp/marshmallow-pagination@master
