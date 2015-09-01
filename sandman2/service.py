@@ -47,6 +47,23 @@ def order_query(model, query, params):
     ])
 
 
+def get_page(query, page):
+    try:
+        page = int(page)
+    except (TypeError, ValueError):
+        raise BadRequestException('Invalid page: "{0}"'.format(page))
+    return query.paginate(page)
+
+
+def format_pagination(page):
+    return {
+        'page': page.page,
+        'pages': page.pages,
+        'count': page.total,
+        'per_page': page.per_page,
+    }
+
+
 def jsonify(resource):
     """Return a Flask ``Response`` object containing a
     JSON representation of *resource*.
@@ -115,9 +132,11 @@ class Service(MethodView):
             if error_message:
                 raise BadRequestException(error_message)
 
+            page = self._all_resources()
             return flask.jsonify({
-                self.__json_collection_name__: self._all_resources()
-                })
+                self.__json_collection_name__: [row.to_dict() for row in page.items],
+                'pagination': format_pagination(page),
+            })
         else:
             resource = self._resource(resource_id)
             error_message = is_valid_method(self.__model__, resource)
@@ -223,11 +242,7 @@ class Service(MethodView):
         query = self.__model__.query
         query = filter_query(self.__model__, query, request.args)
         query = order_query(self.__model__, query, request.args)
-        if 'page' in request.args:
-            query = query.paginate(int(request.args['page'])).items
-        else:
-            query = query.all()
-        return [r.to_dict() for r in query]
+        return get_page(query, request.args.get('page', 1))
 
     @staticmethod
     def _no_content_response():

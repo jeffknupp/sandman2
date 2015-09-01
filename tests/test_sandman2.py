@@ -24,7 +24,7 @@ class TestGetCollection:
     def test_get(self, client):
         """Can we GET a collection of resources properly?"""
         res = client.get('/artist')
-        assert len(res.json['resources']) == 275
+        assert res.json['pagination']['count'] == 275
         assert res.headers['Content-type'] == 'application/json'
         assert res.headers['ETag'] in COLLECTION_ETAGS
 
@@ -66,18 +66,18 @@ class TestGetCollection:
 
     def test_get_query_not_equals(self, client):
         res = client.get('/artist?Name__ne=AC/DC')
-        assert len(res.json['resources']) == 274
+        assert res.json['pagination']['count'] == 274
         assert not any(each['Name'] == 'AC/DC' for each in res.json['resources'])
 
     def test_get_query_not_equals_custom_delimiter(self, client):
         client.app.config['QUERY_DELIMITER'] = '::'
         res = client.get('/artist', {'Name::ne': 'AC/DC'})
-        assert len(res.json['resources']) == 274
+        assert res.json['pagination']['count'] == 274
         assert not any(each['Name'] == 'AC/DC' for each in res.json['resources'])
 
     def test_get_query_not_equals_multiple(self, client):
         res = client.get('/artist', {'Name__ne': ['AC/DC', 'Aerosmith']})
-        assert len(res.json['resources']) == 273
+        assert res.json['pagination']['count'] == 273
         assert not any(each['Name'] in ['AC/DC', 'Aerosmith'] for each in res.json['resources'])
 
     def test_get_query_greater(self, client):
