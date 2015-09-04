@@ -3,10 +3,13 @@ import os
 import sys
 import datetime
 
+import pytest
 from dateutil.parser import parse as parse_date
+from sqlalchemy.ext.automap import automap_base
 
 sys.path.insert(0, os.path.abspath('.'))
 
+from sandman2 import model, get_app
 from tests.resources import *  # noqa
 
 
@@ -17,6 +20,24 @@ def test_get_resource(client):
     assert res.json == TRACK_ONE
     assert res.headers['Content-type'] == 'application/json'
     assert res.headers['ETag'] in RESOURCE_ETAGS
+
+
+class TestCustomBase:
+
+    @pytest.fixture
+    def app(self):
+        database_path = os.path.join('tests', 'data', 'blog.sqlite3')
+        database_uri = 'sqlite+pysqlite:///{0}'.format(database_path)
+        class Base(model.Model, model.db.Model):
+            __abstract__ = True
+            __methods__ = {'GET'}
+        AutomapModel = automap_base(cls=Base)
+        return get_app(database_uri, Base=AutomapModel)
+
+    def test_methods(self, app):
+        assert app.__services__
+        for service in app.__services__:
+            assert service.__model__.__methods__ == {'GET'}
 
 
 class TestGetCollection:
