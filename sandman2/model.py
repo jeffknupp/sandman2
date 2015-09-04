@@ -118,7 +118,7 @@ class Model(object):
     def description(cls):
         """Return a field->data type dictionary describing this model
         as reported by the database.
-        
+
         :rtype: dict
         """
 

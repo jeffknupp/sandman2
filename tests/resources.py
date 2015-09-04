@@ -12,12 +12,12 @@ TRACK_ONE = {
 
 RESOURCE_ETAGS = (
     '"8a4a9037a1eb0a50ed7f8d523e05cfcb"',
-    '"7bcefa90a6faacf8460b00f0bb217388"'
+    '"7bcefa90a6faacf8460b00f0bb217388"',
 )
 
 COLLECTION_ETAGS = (
-    '"4368a846206ec071cb251951b958c2a0"',
-    '"f8d044bc2810a3758722557101e1f4a2"'
+    '"edbada3ecdab228917e6829981313e06"',
+    '"92bb34e18945a21a42a5a92204996576"',
 )
 
 
@@ -39,7 +39,7 @@ NEW_ALBUM = {
 
 ARTIST_META = {
     "ArtistId": "INTEGER (required)",
-    "Name": "NVARCHAR(120)"
+    "Name": "NVARCHAR(120)",
 }
 
 GET_ERROR_MESSAGE = 'Not allowed to call GET on collection'

@@ -3,7 +3,6 @@
 # Third-party imports
 from flask import Flask, current_app, jsonify
 from sqlalchemy.ext.automap import automap_base
-from sqlalchemy.ext.declarative import declarative_base
 
 # Application imports
 from sandman2.exception import (
@@ -15,7 +14,7 @@ from sandman2.exception import (
     ConflictException,
     ServerErrorException,
     ServiceUnavailableException,
-    )
+)
 from sandman2.service import Service
 from sandman2.model import db, Model
 from sandman2.admin import CustomAdminView
@@ -25,15 +24,15 @@ __version__ = '0.0.5'
 
 # Augment sandman2's Model class with the Automap and Flask-SQLAlchemy model
 # classes
-Model = declarative_base(cls=(Model, db.Model))
-AutomapModel = automap_base(Model)
+AutomapModel = automap_base(cls=(Model, db.Model))
 
 
 def get_app(
         database_uri,
         exclude_tables=None,
         user_models=None,
-        reflect_all=True):
+        reflect_all=True,
+        Base=AutomapModel):
     """Return an application instance connected to the database described in
     *database_uri*.
 
@@ -43,6 +42,7 @@ def get_app(
     :param list user_models: A list of user-defined models to include in the
                              API service
     :param bool reflect_all: Include all database tables in the API service
+    :param automap.Base Base: Automap base class
     """
     app = Flask('sandman2')
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
@@ -51,10 +51,10 @@ def get_app(
     _register_error_handlers(app)
     if user_models:
         with app.app_context():
-            _register_user_models(user_models, admin)
+            _register_user_models(user_models, admin, Base=Base)
     elif reflect_all:
         with app.app_context():
-            _reflect_all(exclude_tables, admin)
+            _reflect_all(exclude_tables, admin, Base=Base)
     return app
 
 
@@ -88,6 +88,8 @@ def register_service(cls, primary_key_type='int'):
     """
     view_func = cls.as_view(cls.__name__.lower())  # pylint: disable=no-member
     methods = set(cls.__model__.__methods__)  # pylint: disable=no-member
+    current_app.__services__ = getattr(current_app, '__services__', set())
+    current_app.__services__.add(cls)
 
     if 'GET' in methods:  # pylint: disable=no-member
         current_app.add_url_rule(
@@ -109,15 +111,14 @@ def register_service(cls, primary_key_type='int'):
         methods=methods - set(['POST']))
 
 
-def _reflect_all(exclude_tables=None, admin=None):
+def _reflect_all(exclude_tables=None, admin=None, Base=AutomapModel):
     """Register all tables in the given database as services.
 
     :param list exclude_tables: A list of tables to exclude from the API
                                 service
     """
-    AutomapModel.prepare(  # pylint:disable=maybe-no-member
-        db.engine, reflect=True)
-    for cls in AutomapModel.classes:
+    Base.prepare(db.engine, reflect=True)
+    for cls in Base.classes:
         if exclude_tables and cls.__table__.name in exclude_tables:
             continue
         register_model(cls, admin)
@@ -141,18 +142,17 @@ def register_model(cls, admin=None):
         admin.add_view(CustomAdminView(cls, db.session))
 
 
-def _register_user_models(user_models, admin=None):
+def _register_user_models(user_models, admin=None, Base=AutomapModel):
     """Register any user-defined models with the API Service.
 
     :param list user_models: A list of user-defined models to include in the
                              API service
     """
-    if any([True for cls in user_models if issubclass(cls, AutomapModel)]):
-        AutomapModel.prepare(  # pylint:disable=maybe-no-member
-                               db.engine, reflect=True)
+    if any([True for cls in user_models if issubclass(cls, Base)]):
+        Base.prepare(db.engine, reflect=True)
 
     for user_model in user_models:
-        if not issubclass(user_model, AutomapModel):
+        if not issubclass(user_model, Base):
             model_type = type(user_model.__name__, (user_model, Model), {})
             register_model(model_type, admin)
         else:
