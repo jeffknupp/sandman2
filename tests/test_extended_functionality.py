@@ -2,8 +2,6 @@
 
 from pytest_flask.fixtures import client
 
-exclude_tables = ('Invoice')
-
 def test_pagination(client):
     """Do we return paginated results when a 'page' parameter is provided?"""
     response = client.get('/artist?page=2')
