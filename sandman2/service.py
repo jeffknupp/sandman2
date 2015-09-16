@@ -204,10 +204,22 @@ class Service(MethodView):
         queryset = self.__model__.query
         args = {k: v for (k, v) in request.args.items() if k != 'page'}
         if args:
-            queryset = queryset.filter_by(**args)
+            filters = []
+            order = []
+            limit = None
+            for key, value in args.items():
+                print key, value
+                if value.startswith('%'):
+                    filters.append(getattr(self.__model__, key).like(str(value), escape='/'))
+                elif key == 'sort':
+                    order.append(getattr(self.__model__, value))
+                elif key == 'limit':
+                    limit = value
+                elif key:
+                    filters.append(getattr(self.__model__, key) == value)
+                queryset = queryset.filter(*filters).order_by(*order).limit(limit)
         if 'page' in request.args:
-            resources = queryset.paginate(
-                int(request.args['page'])).items
+            resources = queryset.paginate(int(request.args['page'])).items
         else:
             resources = queryset.all()
         return [r.to_dict() for r in resources]
