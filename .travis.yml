@@ -1,13 +1,12 @@
 language: python
 python:
-  - "2.7"
-  - "3.4"
-install: 
-    - "pip install -r requirements.txt --use-mirrors"
-    - "pip install pytest-cov"
-    - "pip install coverage"
-    - "pip install coveralls"
-script: 
-    - "coverage run --source=sandman2 setup.py test"
+  - 2.7
+  - 3.4
+sudo: false
+install:
+  - travis_retry python setup.py develop
+  - travis_retry pip install pytest-cov coverage coveralls
+script:
+  - coverage run --source=sandman2 setup.py test
 after_success:
-    coveralls
+  coveralls
