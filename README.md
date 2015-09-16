@@ -87,7 +87,7 @@ One of the best things about the original [sandman](http://www.github.com/jeffkn
 
 Here's a shot of the new look:
 
-![admin interface awesomesauce screenshot](http://sandman.io/static/img/sandman2-admin.png)
+![admin interface awesomesauce screenshot](http://jeffknupp.com/images/admin-view.png)
 
 ## Customizing 
 
