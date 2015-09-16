@@ -1,6 +1,6 @@
 # sandman2
 [![Build Status](https://travis-ci.org/jeffknupp/sandman2.svg?branch=master)](https://travis-ci.org/jeffknupp/sandman2)
-[![Coverage Status](https://img.shields.io/coveralls/jeffknupp/sandman2.svg)](https://coveralls.io/r/jeffknupp/sandman2?branch=master)
+[![Coverage Status](https://coveralls.io/repos/jeffknupp/sandman2/badge.svg?branch=master&service=github)](https://coveralls.io/github/jeffknupp/sandman2?branch=master)
 
 sandman2 automagically generates a RESTful API service from your existing database,
 without requiring you to write a line of code. Simply point sandman2 to your
