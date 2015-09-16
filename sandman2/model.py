@@ -24,14 +24,15 @@ class Model(object):
     __version__ = '1'
 
     #: The HTTP methods this resource supports (default=all).
-    __methods__ = set([
+    __methods__ = {
         'GET',
         'POST',
         'PUT',
         'PATCH',
         'DELETE',
         'HEAD',
-        'OPTIONS'])
+        'OPTIONS'
+        }
 
     @classmethod
     def required(cls):

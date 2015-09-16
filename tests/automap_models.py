@@ -7,8 +7,10 @@ class User(AutomapModel):
 
     __tablename__ = 'user'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
+
+    __unicode__ = __str__
 
 
 class Blog(AutomapModel):
@@ -17,8 +19,10 @@ class Blog(AutomapModel):
 
     __tablename__ = 'blog'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
+
+    __unicode__ = __str__
 
 class Post(AutomapModel):
 
@@ -26,5 +30,7 @@ class Post(AutomapModel):
 
     __tablename__ = 'post'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
+
+    __unicode__ = __str__
