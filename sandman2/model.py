@@ -1,6 +1,7 @@
 """Module containing code related to *sandman2* ORM models."""
 
 # Standard library imports
+import datetime
 from decimal import Decimal
 
 # Third-party imports
@@ -77,6 +78,8 @@ class Model(object):
             value = result_dict[column] = getattr(self, column, None)
             if isinstance(value, Decimal):
                 result_dict[column] = float(result_dict[column])
+            elif isinstance(value, datetime.datetime):
+                result_dict[column] = value.isoformat()
         return result_dict
 
     def links(self):
@@ -118,7 +121,7 @@ class Model(object):
     def description(cls):
         """Return a field->data type dictionary describing this model
         as reported by the database.
-        
+
         :rtype: dict
         """
 
