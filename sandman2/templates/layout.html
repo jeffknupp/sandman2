@@ -1,11 +1,6 @@
 {% import 'admin/layout.html' as layout with context -%}
 {% extends 'admin/base.html' %}
 
-{% block head_tail %}
-  {{ super() }}
-  <link href="{{ url_for('static', filename='layout.css') }}" rel="stylesheet">
-{% endblock %}
-
 {% block page_body %}
 <div class="container">
   <div class="row">
