@@ -34,9 +34,16 @@ def main():
              ' from other machines)',
         action='store_true',
         default=False)
+    parser.add_argument(
+        '-r',
+        '--read-only',
+        help='Make all database resources read-only (i.e. only the HTTP GET method is supported)',
+        action='store_true',
+        default=False)
+
 
     args = parser.parse_args()
-    app = get_app(args.URI)
+    app = get_app(args.URI, read_only=args.read_only)
     if args.debug:
         app.config['DEBUG'] = True
     if args.local_only:

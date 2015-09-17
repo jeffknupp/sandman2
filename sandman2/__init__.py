@@ -33,7 +33,8 @@ def get_app(
         database_uri,
         exclude_tables=None,
         user_models=None,
-        reflect_all=True):
+        reflect_all=True,
+        read_only=False):
     """Return an application instance connected to the database described in
     *database_uri*.
 
@@ -46,6 +47,7 @@ def get_app(
     """
     app = Flask('sandman2')
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
+    app.config['SANDMAN2_READ_ONLY'] = read_only
     db.init_app(app)
     admin = Admin(app, base_template='layout.html')
     _register_error_handlers(app)
@@ -54,7 +56,7 @@ def get_app(
             _register_user_models(user_models, admin)
     elif reflect_all:
         with app.app_context():
-            _reflect_all(exclude_tables, admin)
+            _reflect_all(exclude_tables, admin, read_only)
     return app
 
 
@@ -109,7 +111,7 @@ def register_service(cls, primary_key_type='int'):
         methods=methods - set(['POST']))
 
 
-def _reflect_all(exclude_tables=None, admin=None):
+def _reflect_all(exclude_tables=None, admin=None, read_only=False):
     """Register all tables in the given database as services.
 
     :param list exclude_tables: A list of tables to exclude from the API
@@ -120,6 +122,8 @@ def _reflect_all(exclude_tables=None, admin=None):
     for cls in AutomapModel.classes:
         if exclude_tables and cls.__table__.name in exclude_tables:
             continue
+        if read_only:
+            cls.__methods__ = {'GET'}
         register_model(cls, admin)
 
 
