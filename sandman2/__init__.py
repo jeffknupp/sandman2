@@ -21,7 +21,7 @@ from sandman2.model import db, Model
 from sandman2.admin import CustomAdminView
 from flask.ext.admin import Admin
 
-__version__ = '0.0.5'
+__version__ = '0.0.6'
 
 # Augment sandman2's Model class with the Automap and Flask-SQLAlchemy model
 # classes
