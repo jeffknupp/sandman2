@@ -13,8 +13,8 @@ The easiest way to install sandman2 is using ``pip``::
 
 Once installed, sandman2 provides a command-line utility, ``sandman2ctl``, that
 takes your database's URL as a command-line argument and starts a RESTful API
-server immediately. Database URLs are RFC-1738-style_ <http://rfc.net/rfc1738.html_ URLs.
-For more information, please read the `SQLAlchemy documentation`_ <http://docs.sqlalchemy.org/en/latest/core/engines.html#database-urls>`_ on the matter.
+server immediately. Database URLs are `RFC-1738-style <http://rfc.net/rfc1738.html>`_ URLs.
+For more information, please read the `SQLAlchemy documentation <http://docs.sqlalchemy.org/en/latest/core/engines.html#database-urls>`_ on the matter.
 
 **Note:** When using **SQLite**, use ``pysqlite`` as the driver name (i.e.  ``sqlite+pysqlite:///relative/path/to/db``). 
 
@@ -36,6 +36,3 @@ output like the following::
 The API service is available on port 5000 by default (though this is
 configurable). You can interact with your service using ``curl`` or any other HTTP
 client.
-
-.. _RFC-1738-style: http://rfc.net/rfc1738.html
-.. _`SQLAlchemy documentation`: http://docs.sqlalchemy.org/en/latest/core/engines.html#database-urls
