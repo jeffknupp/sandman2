@@ -44,12 +44,13 @@ def get_app(
     :param list user_models: A list of user-defined models to include in the
                              API service
     :param bool reflect_all: Include all database tables in the API service
+    :param bool read_only: Only allow HTTP GET commands for all endpoints
     """
     app = Flask('sandman2')
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
     app.config['SANDMAN2_READ_ONLY'] = read_only
     db.init_app(app)
-    admin = Admin(app, base_template='layout.html')
+    admin = Admin(app, base_template='layout.html', template_mode='bootstrap3')
     _register_error_handlers(app)
     if user_models:
         with app.app_context():
@@ -108,7 +109,7 @@ def register_service(cls, primary_key_type='int'):
             resource=cls.__model__.__url__,
             pk='resource_id', pk_type=primary_key_type),
         view_func=view_func,
-        methods=methods - set(['POST']))
+        methods=methods - {'POST'})
 
 
 def _reflect_all(exclude_tables=None, admin=None, read_only=False):
