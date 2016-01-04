@@ -215,7 +215,14 @@ class Service(MethodView):
                 elif key == 'limit':
                     limit = value
                 elif key:
-                    filters.append(getattr(self.__model__, key) == value)
+                    if '__' in key:
+                        split = key.split('__')
+                        key = split[0]
+                        op = split[1]
+                        exp = 'getattr(self.__model__, key) {op} value'.format(op=op)
+                        filters.append(eval(exp))
+                    else:
+                        filters.append(getattr(self.__model__, key) == value)
                 queryset = queryset.filter(*filters).order_by(*order).limit(limit)
         if 'page' in request.args:
             resources = queryset.paginate(int(request.args['page'])).items
