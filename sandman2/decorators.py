@@ -1,5 +1,5 @@
 """Decorators for sandman2 convenience functions."""
-
+import datetime
 import functools
 import hashlib
 from flask import jsonify, request, make_response
@@ -40,7 +40,7 @@ def etag(func):
 def not_modified():
     """Return an HTTP 304 response if the resource hasn't been modified based
     on the ETag value."""
-    response = jsonify({'status': 304, 'error': 'not modified'})
+    response = jsonify({'status': 304, 'status': 'not modified'})
     response.status_code = 304
     return response
 

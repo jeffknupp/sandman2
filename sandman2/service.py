@@ -115,9 +115,13 @@ class Service(MethodView):
         :param resource_id: The value of the resource's primary key
         """
         resource = self._resource(resource_id)
+        if not resource:
+            raise NotFoundException()
         error_message = is_valid_method(self.__model__, resource)
         if error_message:
             raise BadRequestException(error_message)
+        if not request.json:
+            raise BadRequestException('No JSON data received')
         resource.update(request.json)
         db.session().merge(resource)
         db.session().commit()
@@ -159,7 +163,6 @@ class Service(MethodView):
         :returns: ``HTTP 201`` if a new resource is created
         :returns: ``HTTP 200`` if a resource is updated
         :returns: ``HTTP 400`` if the request is malformed or missing data
-        :returns: ``HTTP 404`` if the resource is not found
         """
         resource = self.__model__.query.get(resource_id)
         if resource:
