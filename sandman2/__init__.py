@@ -82,7 +82,7 @@ def _register_error_handlers(app):
         return response
 
 
-def register_service(cls, primary_key_type='int'):
+def register_service(cls, primary_key_type):
     """Register an API service endpoint.
 
     :param cls: The class to register
@@ -141,7 +141,28 @@ def register_model(cls, admin=None):
             '__model__': cls,
             '__version__': __version__,
         })
-    register_service(service_class)
+    
+    # inspect primary key    
+    keys = list(cls().__table__.primary_key.columns)
+    
+    # composite keys not supported (yet)
+    if len(cols) != 1:
+        primary_key_type = None
+    else:
+        col_type = cols[0].type
+        # types defined at http://flask.pocoo.org/docs/0.10/api/#url-route-registrations
+        if isinstance(col_type, sqltypes.String):
+            primary_key_type = 'string'
+        elif isinstance(col_type, sqltypes.Integer):
+            primary_key_type = 'int'
+        elif isinstance(col_type, sqltypes.Numeric):
+            primary_key_type = 'float'
+        else:
+            # unsupported primary key type
+            primary_key_type = None
+    
+    # registration
+    register_service(service_class, primary_key_type)
     if admin is not None:
         admin.add_view(CustomAdminView(cls, db.session))
 
