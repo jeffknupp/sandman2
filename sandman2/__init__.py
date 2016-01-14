@@ -4,6 +4,7 @@
 from flask import Flask, current_app, jsonify
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.sql import sqltypes
 
 # Application imports
 from sandman2.exception import (
