@@ -147,9 +147,8 @@ def register_model(cls, admin=None):
     cols = list(cls().__table__.primary_key.columns)
     
     # composite keys not supported (yet)
-    if len(cols) != 1:
-        primary_key_type = 'string'
-    else:
+    primary_key_type = 'string'
+    if len(cols) == 1:
         col_type = cols[0].type
         # types defined at http://flask.pocoo.org/docs/0.10/api/#url-route-registrations
         if isinstance(col_type, sqltypes.String):
