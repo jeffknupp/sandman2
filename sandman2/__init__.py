@@ -160,7 +160,7 @@ def register_model(cls, admin=None):
             primary_key_type = 'float'
         else:
             # unsupported primary key type
-            primary_key_type = None
+            primary_key_type = 'string'
     
     # registration
     register_service(service_class, primary_key_type)
