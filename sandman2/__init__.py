@@ -143,7 +143,7 @@ def register_model(cls, admin=None):
         })
     
     # inspect primary key    
-    keys = list(cls().__table__.primary_key.columns)
+    cols = list(cls().__table__.primary_key.columns)
     
     # composite keys not supported (yet)
     if len(cols) != 1:
