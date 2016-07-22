@@ -12,12 +12,15 @@ TRACK_ONE = {
 
 RESOURCE_ETAGS = (
     '"8a4a9037a1eb0a50ed7f8d523e05cfcb"',
-    '"7bcefa90a6faacf8460b00f0bb217388"'
+    '"7bcefa90a6faacf8460b00f0bb217388"',
+    '"8527642c9c0fbbd6807e49c30d93a2c6"',
 )
 
 COLLECTION_ETAGS = (
     '"4368a846206ec071cb251951b958c2a0"',
-    '"f8d044bc2810a3758722557101e1f4a2"'
+    '"f8d044bc2810a3758722557101e1f4a2"',
+    '"8527642c9c0fbbd6807e49c30d93a2c6"',
+    '"90f8a11222df8b83d6f1cee626a154a5"',
 )
 
 
