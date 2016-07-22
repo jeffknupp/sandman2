@@ -8,6 +8,12 @@ sys.path.insert(0, os.path.abspath('.'))
 from tests.resources import *
 from pytest_flask.fixtures import client
 
+def test_get_root(client):
+    """Can we GET a list of resources from `/`"""
+    response = client.get('/')
+    assert response.status_code == 200
+    assert response.headers['Content-type'] == 'application/json'
+
 
 def test_get_resource(client):
     """Can we GET a resource properly?"""

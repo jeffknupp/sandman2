@@ -50,6 +50,7 @@ def get_app(
     app = Flask('sandman2')
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
     app.config['SANDMAN2_READ_ONLY'] = read_only
+    app.classes = []
     db.init_app(app)
     admin = Admin(app, base_template='layout.html', template_mode='bootstrap3')
     _register_error_handlers(app)
@@ -59,6 +60,16 @@ def get_app(
     elif reflect_all:
         with app.app_context():
             _reflect_all(exclude_tables, admin, read_only)
+
+    @app.route('/')
+    def index():
+        """Return a list of routes to the registered classes."""
+        routes = {}
+        for cls in app.classes:
+            routes[cls.__model__.__name__] = '{}{{/{}}}'.format(
+                cls.__model__.__url__,
+                cls.__model__.primary_key())
+        return jsonify(routes)
     return app
 
 
@@ -111,6 +122,7 @@ def register_service(cls, primary_key_type):
             pk='resource_id', pk_type=primary_key_type),
         view_func=view_func,
         methods=methods - {'POST'})
+    current_app.classes.append(cls)
 
 
 def _reflect_all(exclude_tables=None, admin=None, read_only=False):

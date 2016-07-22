@@ -61,13 +61,14 @@ class Model(object):
                 columns.append(column.name)
         return columns
 
-    def primary_key(self):
+    @classmethod
+    def primary_key(cls):
         """Return the key of the model's primary key field.
 
         :rtype: string
         """
         return list(
-            self.__table__.primary_key.columns)[  # pylint: disable=no-member
+            cls.__table__.primary_key.columns)[  # pylint: disable=no-member
                 0].key
 
     def to_dict(self):
