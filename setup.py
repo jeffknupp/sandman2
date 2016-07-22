@@ -56,6 +56,7 @@ setup(
         'Flask-SQLAlchemy>=1.0',
         'pytest-flask==0.4.0',
         'Flask-Admin>=1.0.9',
+        'Flask-HTTPAuth>=3.1.2',
         ],
     cmdclass={'test': PyTest},
     author_email='jeff@jeffknupp.com',
@@ -86,5 +87,4 @@ setup(
         'Topic :: Software Development :: Libraries :: Application Frameworks',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         ],
-    extras_require={'testing': ['pytest', 'pytest-cov']},
 )
