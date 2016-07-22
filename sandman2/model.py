@@ -62,13 +62,13 @@ class Model(object):
         return columns
 
     def primary_key(self):
-        """Return the name of the model's primary key field.
+        """Return the key of the model's primary key field.
 
         :rtype: string
         """
         return list(
             self.__table__.primary_key.columns)[  # pylint: disable=no-member
-                0].name
+                0].key
 
     def to_dict(self):
         """Return the resource as a dictionary.
