@@ -20,7 +20,8 @@ from sandman2.exception import (
 from sandman2.service import Service
 from sandman2.model import db, Model
 from sandman2.admin import CustomAdminView
-from flask.ext.admin import Admin
+from flask_admin import Admin
+from flask_httpauth import HTTPBasicAuth
 
 __version__ = '0.0.7'
 
@@ -28,7 +29,7 @@ __version__ = '0.0.7'
 # classes
 Model = declarative_base(cls=(Model, db.Model))
 AutomapModel = automap_base(Model)
-
+auth = HTTPBasicAuth()
 
 def get_app(
         database_uri,
