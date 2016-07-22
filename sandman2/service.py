@@ -88,7 +88,7 @@ class Service(MethodView):
 
         :param resource_id: The value of the resource's primary key
         """
-        if 'meta' in request.path:
+        if request.path.endswith('meta'):
             return self._meta()
 
         if resource_id is None:
@@ -217,8 +217,10 @@ class Service(MethodView):
                     order.append(getattr(self.__model__, value))
                 elif key == 'limit':
                     limit = value
-                elif key:
+                elif hasattr(self.__model__, key):
                     filters.append(getattr(self.__model__, key) == value)
+                else:
+                    raise BadRequestException('Invalid field [{}]'.format(key))
                 queryset = queryset.filter(*filters).order_by(*order).limit(limit)
         if 'page' in request.args:
             resources = queryset.paginate(int(request.args['page'])).items

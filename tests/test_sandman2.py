@@ -27,7 +27,7 @@ def test_get_resource(client):
 
 def test_get_collection(client):
     """Can we GET a collection of resources properly?"""
-    response = client.get('/artist')
+    response = client.get('/artist/')
     assert response.status_code == 200
     json_response = json.loads(
         response.get_data(as_text=True))['resources']
@@ -39,7 +39,7 @@ def test_get_collection(client):
 def test_post(client):
     """Can we POST a new resource properly?"""
     response = client.post(
-        '/album',
+        '/album/',
         data=json.dumps({
             'Title': 'Some Title',
             'ArtistId': 1,
@@ -52,7 +52,7 @@ def test_post(client):
 def test_post_missing_field(client):
     """Do we reject a POST with a missing required field?"""
     response = client.post(
-        '/album',
+        '/album/',
         data=json.dumps({
             'ArtistId': 1,
             }),
@@ -63,13 +63,13 @@ def test_post_missing_field(client):
 def test_post_existing(client):
     """Can we POST a new resource properly?"""
     client.post(
-        '/artist',
+        '/artist/',
         data=json.dumps({
             'Name': 'Jeff Knupp',
             }),
         headers={'Content-type': 'application/json'})
     response = client.post(
-        '/artist',
+        '/artist/',
         data=json.dumps({
             'Name': 'Jeff Knupp',
             }),
@@ -103,6 +103,15 @@ def test_put_new(client):
     assert response.status_code == 201
     assert json.loads(response.get_data(as_text=True)) == NEW_ARTIST
 
+def test_search_collection(client):
+    """Can we GET a collection of resources properly?"""
+    response = client.get('/artist/?Name=Calexico')
+    assert response.status_code == 200
+    json_response = json.loads(
+        response.get_data(as_text=True))['resources']
+    assert len(json_response) == 1
+    assert response.headers['Content-type'] == 'application/json'
+
 
 def test_delete(client):
     """Can we DELETE a resource?"""
@@ -124,7 +133,7 @@ def test_patch(client):
 
 def test_post_no_data(client):
     """Do we properly reject a POST with no JSON data?"""
-    response = client.post('/artist')
+    response = client.post('/artist/')
     json_response = json.loads(response.get_data(as_text=True))
     assert json_response == {'message': 'No data received from request'}
 
@@ -132,7 +141,7 @@ def test_post_no_data(client):
 def test_post_unknown_field(client):
     """Do we properly reject a POST with an unknown field?"""
     response = client.post(
-        '/artist',
+        '/artist/',
         data=json.dumps({'foo': 'bar', 'Name': 'Jeff Knupp'}),
         headers={'Content-type': 'application/json'}
     )
