@@ -40,10 +40,15 @@ def main():
         help='Make all database resources read-only (i.e. only the HTTP GET method is supported)',
         action='store_true',
         default=False)
-
+    parser.add_argument(
+        '-s',
+        '--schema',
+        help='Use the specified schema when reflecting database tables',
+        action='store_true',
+        default=None)
 
     args = parser.parse_args()
-    app = get_app(args.URI, read_only=args.read_only)
+    app = get_app(args.URI, read_only=args.read_only, schema=args.schema)
     if args.debug:
         app.config['DEBUG'] = True
     if args.local_only:

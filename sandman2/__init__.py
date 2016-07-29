@@ -31,12 +31,14 @@ Model = declarative_base(cls=(Model, db.Model))
 AutomapModel = automap_base(Model)
 auth = HTTPBasicAuth()
 
+
 def get_app(
         database_uri,
         exclude_tables=None,
         user_models=None,
         reflect_all=True,
-        read_only=False):
+        read_only=False,
+        schema=None):
     """Return an application instance connected to the database described in
     *database_uri*.
 
@@ -48,6 +50,7 @@ def get_app(
     :param bool reflect_all: Include all database tables in the API service
     :param bool read_only: Only allow HTTP GET commands for all endpoints
     """
+
     app = Flask('sandman2')
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
     app.config['SANDMAN2_READ_ONLY'] = read_only
@@ -60,7 +63,7 @@ def get_app(
             _register_user_models(user_models, admin)
     elif reflect_all:
         with app.app_context():
-            _reflect_all(exclude_tables, admin, read_only)
+            _reflect_all(exclude_tables, admin, read_only, schema)
 
     @app.route('/')
     def index():
@@ -126,14 +129,14 @@ def register_service(cls, primary_key_type):
     current_app.classes.append(cls)
 
 
-def _reflect_all(exclude_tables=None, admin=None, read_only=False):
+def _reflect_all(exclude_tables=None, admin=None, read_only=False, schema=None):
     """Register all tables in the given database as services.
 
     :param list exclude_tables: A list of tables to exclude from the API
                                 service
     """
     AutomapModel.prepare(  # pylint:disable=maybe-no-member
-        db.engine, reflect=True)
+        db.engine, reflect=True, schema=schema)
     for cls in AutomapModel.classes:
         if exclude_tables and cls.__table__.name in exclude_tables:
             continue
