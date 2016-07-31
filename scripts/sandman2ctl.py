@@ -50,6 +50,7 @@ def main():
         host = '127.0.0.1'
     else:
         host = '0.0.0.0'
+    app.config['SECRET_KEY'] = '42'
     app.run(host=host, port=int(args.port))
 
 
