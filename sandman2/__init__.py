@@ -23,7 +23,7 @@ from sandman2.admin import CustomAdminView
 from flask_admin import Admin
 from flask_httpauth import HTTPBasicAuth
 
-__version__ = '0.0.7'
+__version__ = '0.1.0'
 
 # Augment sandman2's Model class with the Automap and Flask-SQLAlchemy model
 # classes
