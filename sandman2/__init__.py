@@ -36,7 +36,8 @@ def get_app(
         exclude_tables=None,
         user_models=None,
         reflect_all=True,
-        read_only=False):
+        read_only=False,
+        schema=None):
     """Return an application instance connected to the database described in
     *database_uri*.
 
@@ -47,6 +48,7 @@ def get_app(
                              API service
     :param bool reflect_all: Include all database tables in the API service
     :param bool read_only: Only allow HTTP GET commands for all endpoints
+    :param str schema: Use the specified named schema instead of the default
     """
     app = Flask('sandman2')
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
@@ -57,10 +59,10 @@ def get_app(
     _register_error_handlers(app)
     if user_models:
         with app.app_context():
-            _register_user_models(user_models, admin)
+            _register_user_models(user_models, admin, schema=schema)
     elif reflect_all:
         with app.app_context():
-            _reflect_all(exclude_tables, admin, read_only)
+            _reflect_all(exclude_tables, admin, read_only, schema=schema)
 
     @app.route('/')
     def index():
@@ -126,14 +128,14 @@ def register_service(cls, primary_key_type):
     current_app.classes.append(cls)
 
 
-def _reflect_all(exclude_tables=None, admin=None, read_only=False):
+def _reflect_all(exclude_tables=None, admin=None, read_only=False, schema=None):
     """Register all tables in the given database as services.
 
     :param list exclude_tables: A list of tables to exclude from the API
                                 service
     """
     AutomapModel.prepare(  # pylint:disable=maybe-no-member
-        db.engine, reflect=True)
+        db.engine, reflect=True, schema=schema)
     for cls in AutomapModel.classes:
         if exclude_tables and cls.__table__.name in exclude_tables:
             continue
@@ -155,10 +157,10 @@ def register_model(cls, admin=None):
             '__model__': cls,
             '__version__': __version__,
         })
-    
-    # inspect primary key    
+
+    # inspect primary key
     cols = list(cls().__table__.primary_key.columns)
-    
+
     # composite keys not supported (yet)
     primary_key_type = 'string'
     if len(cols) == 1:
@@ -173,14 +175,14 @@ def register_model(cls, admin=None):
         else:
             # unsupported primary key type
             primary_key_type = 'string'
-    
+
     # registration
     register_service(service_class, primary_key_type)
     if admin is not None:
         admin.add_view(CustomAdminView(cls, db.session))
 
 
-def _register_user_models(user_models, admin=None):
+def _register_user_models(user_models, admin=None, schema=None):
     """Register any user-defined models with the API Service.
 
     :param list user_models: A list of user-defined models to include in the
@@ -188,7 +190,7 @@ def _register_user_models(user_models, admin=None):
     """
     if any([True for cls in user_models if issubclass(cls, AutomapModel)]):
         AutomapModel.prepare(  # pylint:disable=maybe-no-member
-                               db.engine, reflect=True)
+                               db.engine, reflect=True, schema=schema)
 
     for user_model in user_models:
         if not issubclass(user_model, AutomapModel):
