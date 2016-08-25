@@ -59,10 +59,10 @@ def get_app(
     _register_error_handlers(app)
     if user_models:
         with app.app_context():
-            _register_user_models(user_models, admin, schema)
+            _register_user_models(user_models, admin, schema=schema)
     elif reflect_all:
         with app.app_context():
-            _reflect_all(exclude_tables, admin, read_only, schema)
+            _reflect_all(exclude_tables, admin, read_only, schema=schema)
 
     @app.route('/')
     def index():
@@ -135,7 +135,7 @@ def _reflect_all(exclude_tables=None, admin=None, read_only=False, schema=None):
                                 service
     """
     AutomapModel.prepare(  # pylint:disable=maybe-no-member
-        db.engine, reflect=True)
+        db.engine, reflect=True, schema=schema)
     for cls in AutomapModel.classes:
         if exclude_tables and cls.__table__.name in exclude_tables:
             continue
