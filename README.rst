@@ -33,7 +33,7 @@ RESTful API, and starts the server.
 What Happened to Sandman (1)?
 -----------------------------
 
-```sandman`` <http://www.github.com/jeffknupp/sandman>`__, the precursor
+`sandman <http://www.github.com/jeffknupp/sandman>`__, the precursor
 to ``sandman2``, is no longer being maintianed. ``sandman`` had almost
 identical functionality but had an architecutre that reflected the
 capabilities of the underlying ORM, SQLAlchemy. As of the ``0.9``
