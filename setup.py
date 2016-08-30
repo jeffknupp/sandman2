@@ -16,16 +16,6 @@ def read(*parts):
     # intentionally *not* adding an encoding option to open
     return codecs.open(os.path.join(HERE, *parts), 'r').read()
 
-
-def find_version(*file_paths):
-    """Find the "__version__" string in files on *file_path*."""
-    version_file = read(*file_paths)
-    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
-                              version_file, re.M)
-    if version_match:
-        return version_match.group(1)
-    raise RuntimeError("Unable to find version string.")
-
 LONG_DESCRIPTION = read('README.rst')
 
 
@@ -46,7 +36,7 @@ class PyTest(TestCommand):
 
 setup(
     name='sandman2',
-    version=find_version('sandman2', '__init__.py'),
+    version='0.1.4',
     url='http://github.com/jeffknupp/sandman2/',
     license='Apache Software License',
     author='Jeff Knupp',
