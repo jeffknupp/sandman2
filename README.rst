@@ -33,7 +33,7 @@ RESTful API, and starts the server.
 What Happened to Sandman (1)?
 -----------------------------
 
-`sandman <http://www.github.com/jeffknupp/sandman>`__, the precursor
+`sandman <http://www.github.com/jeffknupp/sandman>`_, the precursor
 to ``sandman2``, is no longer being maintianed. ``sandman`` had almost
 identical functionality but had an architecutre that reflected the
 capabilities of the underlying ORM, SQLAlchemy. As of the ``0.9``
@@ -57,7 +57,7 @@ Quickstart
 Install sandman2 using ``pip``: ``$ pip install sandman2``. This
 provides the script ``sandman2ctl``, which just takes the database URI
 string, described
-`here <http://docs.sqlalchemy.org/en/rel_0_9/core/engines.html>`__. For
+`here <http://docs.sqlalchemy.org/en/rel_0_9/core/engines.html>`_. For
 example, to connect to a SQLite database in the same directory you're
 running the script, you would run:
 
@@ -73,7 +73,7 @@ To connect to a PostgreSQL database, make sure you install a driver like
     $ sandman2ctl postgresql+psycopg2://scott:tiger@localhost/mydatabase
 
 Again, see `the SQLAlchemy
-documentation <http://docs.sqlalchemy.org/en/rel_0_9/core/engines.html>`__
+documentation <http://docs.sqlalchemy.org/en/rel_0_9/core/engines.html>`_
 for a more comprehensive discussion of connection strings.
 
 Supported Databases
@@ -102,7 +102,7 @@ Admin Interface
 ---------------
 
 One of the best things about the original
-`sandman <http://www.github.com/jeffknupp/sandman>`__ was the *Admin
+`sandman <http://www.github.com/jeffknupp/sandman>`_ was the *Admin
 Interface*. Not only does sandman2 include the Admin Interface, but it
 modernize's it as well. The layout has been greatly improved, especially
 when dealing with larger numbers of tables. All of the original
