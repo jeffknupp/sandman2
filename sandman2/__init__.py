@@ -153,7 +153,6 @@ def register_model(cls, admin=None):
         (Service,),
         {
             '__model__': cls,
-            '__version__': __version__,
         })
 
     # inspect primary key
