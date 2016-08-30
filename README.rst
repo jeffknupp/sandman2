@@ -110,7 +110,7 @@ functionality of the Admin Interface remains unchanged.
 
 Here's a shot of the new look:
 
-.. figure:: http://sandman.io/static/img/sandman2-admin.png
+.. figure:: https://camo.githubusercontent.com/8d6b264ee78bcaef0621a7c399f9617a42defb6e/687474703a2f2f6a6566666b6e7570702e636f6d2f696d616765732f61646d696e2d766965772e706e67
    :alt: admin interface awesomesauce screenshot
 
    admin interface awesomesauce screenshot
