@@ -131,6 +131,13 @@ def test_patch(client):
         )
     assert response.status_code == 200
 
+def test_patch_no_data(client):
+    """Do we get an error if we try to PATCH a non-existent resource?"""
+    response = client.patch(
+        '/artist/1',
+        )
+    assert response.status_code == 400
+
 
 def test_post_no_data(client):
     """Do we properly reject a POST with no JSON data?"""

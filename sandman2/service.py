@@ -115,8 +115,6 @@ class Service(MethodView):
         :param resource_id: The value of the resource's primary key
         """
         resource = self._resource(resource_id)
-        if not resource:
-            raise NotFoundException()
         error_message = is_valid_method(self.__model__, resource)
         if error_message:
             raise BadRequestException(error_message)
