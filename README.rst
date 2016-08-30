@@ -114,6 +114,7 @@ Here's a shot of the new look:
    :alt: admin interface awesomesauce screenshot
 
    admin interface awesomesauce screenshot
+
 Customizing
 -----------
 
