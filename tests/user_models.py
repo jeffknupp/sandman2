@@ -49,7 +49,7 @@ class Blog(db.Model):
 
     __tablename__ = 'blog'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String, primary_key=True)
     name = db.Column(db.String)
     subheader = db.Column(db.String, nullable=True)
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -62,7 +62,7 @@ class Post(db.Model):
 
     __tablename__ = 'post'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Numeric, primary_key=True)
     title = db.Column(db.String)
     content = db.Column(db.String)
     posted_at = db.Column(db.DateTime, default=datetime.datetime.now)

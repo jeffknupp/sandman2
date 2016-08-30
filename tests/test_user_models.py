@@ -11,7 +11,6 @@ from tests.resources import (
 model_module = 'tests.user_models'
 database = 'blog.sqlite3'
 
-
 def test_validate_get(client):
     """Do we get back an error message when making a GET request that fails
     validation?"""

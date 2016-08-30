@@ -7,6 +7,7 @@ sys.path.insert(0, os.path.abspath('.'))
 
 from tests.resources import *
 from pytest_flask.fixtures import client
+exclude_tables = ['Playlist']
 
 def test_get_root(client):
     """Can we GET a list of resources from `/`"""

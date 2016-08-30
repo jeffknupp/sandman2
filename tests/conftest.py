@@ -17,6 +17,7 @@ from sandman2 import get_app, db
 def app(request):
     """Yield the application instance."""
     database = getattr(request.module, 'database', 'db.sqlite3')
+    read_only = getattr(request.module, 'read_only', False)
     exclude_tables = getattr(request.module, 'exclude_tables', None)
     test_database_path = os.path.join('tests', 'data', 'test_db.sqlite3')
     pristine_database_path = os.path.join('tests', 'data', database)
@@ -36,7 +37,8 @@ def app(request):
         'sqlite+pysqlite:///{}'.format(
             test_database_path),
         user_models=user_models,
-        exclude_tables=exclude_tables)
+        exclude_tables=exclude_tables,
+        read_only=read_only)
     application.testing = True
 
     yield application
