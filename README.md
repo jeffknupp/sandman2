@@ -29,8 +29,8 @@ connects to it, introspects the schema, generates a RESTful API, and starts the 
 
 ## What Happened to Sandman (1)?
 
-[`sandman`](http://www.github.com/jeffknupp/sandman), the precursor to `sandman2`, is no longer being maintianed. `sandman` had almost identical
-functionality but had an architecutre that reflected the capabilities of the underlying ORM, SQLAlchemy. As of the `0.9` release, SQLAlchemy
+[`sandman`](http://www.github.com/jeffknupp/sandman), the precursor to `sandman2`, is no longer being maintained. `sandman` had almost identical
+functionality but had an architecture that reflected the capabilities of the underlying ORM, SQLAlchemy. As of the `0.9` release, SQLAlchemy
 introduced the `automap` construct. This fundamentally changed the way that `sandman` *could* interact with the underlying database in a
 way that greatly simplified things. All that was needed was the actual effort to rewrite `sandman` from scratch...
 
