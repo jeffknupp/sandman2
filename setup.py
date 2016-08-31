@@ -44,7 +44,8 @@ setup(
     install_requires=[
         'Flask>=0.10.1',
         'Flask-SQLAlchemy>=1.0',
-        'pytest-flask==0.4.0',
+        'SQLAlchemy==1.1.0b3',
+        'pytest-flask>=0.4.0',
         'Flask-Admin>=1.0.9',
         'Flask-HTTPAuth>=3.1.2',
         ],
