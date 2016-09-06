@@ -1,13 +1,13 @@
 import datetime
 
-from sandman2.model import db
+from sandman2.model import db, Model
 
 from tests.resources import (
     GET_ERROR_MESSAGE,
     INVALID_ACTION_MESSAGE,
     )
 
-class User(db.Model):
+class User(db.Model, Model):
 
     """A user of the blogging application."""
 
@@ -43,7 +43,7 @@ class User(db.Model):
         return INVALID_ACTION_MESSAGE
 
 
-class Blog(db.Model):
+class Blog(db.Model, Model):
 
     """An online weblog."""
 
@@ -56,7 +56,7 @@ class Blog(db.Model):
     creator = db.relationship(User)
 
 
-class Post(db.Model):
+class Post(db.Model, Model):
 
     """An individual blog post."""
 

@@ -27,6 +27,13 @@ def test_validate_get_single_resource(client):
     assert response.json['message'] == INVALID_ACTION_MESSAGE
 
 
+def test_get_datetime(client):
+    """Do we get back a properly formatted datetime on a model that defines one?"""
+    response = client.get('/post/1.0')
+    assert response.status_code == 200
+    assert response.json['posted_at'] is not None
+
+
 def test_validate_post(client):
     """Do we get back an error message when making a POST request that fails
     validation?"""
@@ -43,8 +50,7 @@ def test_validate_post(client):
 
 
 def test_validate_post_existing_resource(client):
-    """Do we get back an error message when making a POST request 
-    on a resource that already exists?"""
+    """Do we get back an error message when making a POST request on a resource that already exists?"""
     response = client.post(
         '/user/',
         data=json.dumps({
@@ -55,8 +61,6 @@ def test_validate_post_existing_resource(client):
     )
     assert response.status_code == 400
     assert response.json['message'] == INVALID_ACTION_MESSAGE
-
-
 
 
 def test_validate_put_existing(client):

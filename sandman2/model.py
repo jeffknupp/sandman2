@@ -6,7 +6,9 @@ from decimal import Decimal
 
 # Third-party imports
 from sqlalchemy.inspection import inspect
-from flask.ext.sqlalchemy import SQLAlchemy  # pylint: disable=import-error,no-name-in-module
+from flask_sqlalchemy import SQLAlchemy  # pylint: disable=import-error,no-name-in-module
+from sqlalchemy.ext.automap import automap_base
+from sqlalchemy.ext.declarative import declarative_base
 
 db = SQLAlchemy()
 
@@ -135,3 +137,6 @@ class Model(object):
                 column_description += ' (required)'
             description[column.name] = column_description
         return description
+
+DeclarativeModel = declarative_base(cls=(db.Model, Model))
+AutomapModel = automap_base(DeclarativeModel)

@@ -2,6 +2,8 @@
 
 # Third-party imports
 from flask import Flask, current_app, jsonify
+from sqlalchemy.ext.automap import automap_base
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import sqltypes
 
 # Application imports
@@ -16,13 +18,17 @@ from sandman2.exception import (
     ServiceUnavailableException,
     )
 from sandman2.service import Service
-from sandman2.model import db, Model, AutomapModel
+from sandman2.model import db, Model
 from sandman2.admin import CustomAdminView
 from flask_admin import Admin
 from flask_httpauth import HTTPBasicAuth
 
+__version__ = '0.1.0'
+
 # Augment sandman2's Model class with the Automap and Flask-SQLAlchemy model
 # classes
+Model = declarative_base(cls=(Model, db.Model))
+AutomapModel = automap_base(Model)
 auth = HTTPBasicAuth()
 
 def get_app(
@@ -30,8 +36,7 @@ def get_app(
         exclude_tables=None,
         user_models=None,
         reflect_all=True,
-        read_only=False,
-        schema=None):
+        read_only=False):
     """Return an application instance connected to the database described in
     *database_uri*.
 
@@ -42,7 +47,6 @@ def get_app(
                              API service
     :param bool reflect_all: Include all database tables in the API service
     :param bool read_only: Only allow HTTP GET commands for all endpoints
-    :param str schema: Use the specified named schema instead of the default
     """
     app = Flask('sandman2')
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
@@ -53,10 +57,10 @@ def get_app(
     _register_error_handlers(app)
     if user_models:
         with app.app_context():
-            _register_user_models(user_models, admin, schema=schema)
+            _register_user_models(user_models, admin)
     elif reflect_all:
         with app.app_context():
-            _reflect_all(exclude_tables, admin, read_only, schema=schema)
+            _reflect_all(exclude_tables, admin, read_only)
 
     @app.route('/')
     def index():
@@ -122,14 +126,14 @@ def register_service(cls, primary_key_type):
     current_app.classes.append(cls)
 
 
-def _reflect_all(exclude_tables=None, admin=None, read_only=False, schema=None):
+def _reflect_all(exclude_tables=None, admin=None, read_only=False):
     """Register all tables in the given database as services.
 
     :param list exclude_tables: A list of tables to exclude from the API
                                 service
     """
     AutomapModel.prepare(  # pylint:disable=maybe-no-member
-        db.engine, reflect=True, schema=schema)
+        db.engine, reflect=True)
     for cls in AutomapModel.classes:
         if exclude_tables and cls.__table__.name in exclude_tables:
             continue
@@ -149,11 +153,12 @@ def register_model(cls, admin=None):
         (Service,),
         {
             '__model__': cls,
+            '__version__': __version__,
         })
-
-    # inspect primary key
+    
+    # inspect primary key    
     cols = list(cls().__table__.primary_key.columns)
-
+    
     # composite keys not supported (yet)
     primary_key_type = 'string'
     if len(cols) == 1:
@@ -165,14 +170,17 @@ def register_model(cls, admin=None):
             primary_key_type = 'int'
         elif isinstance(col_type, sqltypes.Numeric):
             primary_key_type = 'float'
-
+        else:
+            # unsupported primary key type
+            primary_key_type = 'string'
+    
     # registration
     register_service(service_class, primary_key_type)
     if admin is not None:
         admin.add_view(CustomAdminView(cls, db.session))
 
 
-def _register_user_models(user_models, admin=None, schema=None):
+def _register_user_models(user_models, admin=None):
     """Register any user-defined models with the API Service.
 
     :param list user_models: A list of user-defined models to include in the
@@ -180,7 +188,11 @@ def _register_user_models(user_models, admin=None, schema=None):
     """
     if any([True for cls in user_models if issubclass(cls, AutomapModel)]):
         AutomapModel.prepare(  # pylint:disable=maybe-no-member
-                               db.engine, reflect=True, schema=schema)
+                               db.engine, reflect=True)
 
     for user_model in user_models:
-        register_model(user_model, admin)
+        if not issubclass(user_model, AutomapModel):
+            model_type = type(user_model.__name__, (user_model, Model), {})
+            register_model(model_type, admin)
+        else:
+            register_model(user_model, admin)

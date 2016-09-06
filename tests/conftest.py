@@ -30,7 +30,7 @@ def app(request):
         module = importlib.import_module(model_module)
         for name, obj in inspect.getmembers(module):
             if inspect.isclass(obj):
-                if name != 'AutomapModel':
+                if name not in ('Model', 'AutomapModel'):
                     user_models.append(obj)
 
     application = get_app(
