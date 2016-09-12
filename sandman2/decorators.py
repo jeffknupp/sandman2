@@ -19,8 +19,6 @@ def etag(func):
         assert request.method in ['HEAD', 'GET'],\
             '@etag is only supported for GET requests'
         response = func(*args, **kwargs)
-        if response.direct_passthrough:
-            return response
         response = make_response(response)
         etag_value = '"' + hashlib.md5(response.get_data()).hexdigest() + '"'
         response.headers['ETag'] = etag_value
