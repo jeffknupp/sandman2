@@ -3,7 +3,7 @@ ORM models or a database introspection."""
 
 # Standard library imports
 import csv
-import cStringIO
+import io
 
 # Third-party imports
 from flask import request, make_response
@@ -238,12 +238,10 @@ class Service(MethodView):
         :param list collection: A list of resources represented by dicts
         """
         fieldnames = collection[0].keys()
-        csvfile = cStringIO.StringIO()
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(collection)
-        response = make_response(csvfile.getvalue())
-        csvfile.close()
+        faux_csv = ','.join(fieldnames) + '\r\n'
+        for resource in collection:
+            faux_csv += ','.join((str(x) for x in resource.values())) + '\r\n'
+        response = make_response(faux_csv)
         response.mimetype = 'text/csv'
         return response
 
