@@ -1,6 +1,10 @@
 """Automatically generated REST API services from SQLAlchemy
 ORM models or a database introspection."""
 
+# Standard library imports
+import csv
+import cStringIO
+
 # Third-party imports
 from flask import request, make_response
 import flask
@@ -48,7 +52,6 @@ def is_valid_method(model, resource=None):
     if hasattr(model, validation_function_name):
         return getattr(model, validation_function_name)(request, resource)
 
-
 class Service(MethodView):
 
     """The *Service* class is a generic extension of Flask's *MethodView*,
@@ -95,6 +98,9 @@ class Service(MethodView):
             error_message = is_valid_method(self.__model__)
             if error_message:
                 raise BadRequestException(error_message)
+
+            if 'export' in request.args: 
+                return self._export(self._all_resources())
 
             return flask.jsonify({
                 self.__json_collection_name__: self._all_resources()
@@ -203,7 +209,7 @@ class Service(MethodView):
         :rtype: :class:`sandman2.model.Model`
         """
         queryset = self.__model__.query
-        args = {k: v for (k, v) in request.args.items() if k != 'page'}
+        args = {k: v for (k, v) in request.args.items() if k not in ('page', 'export')}
         if args:
             filters = []
             order = []
@@ -225,6 +231,22 @@ class Service(MethodView):
         else:
             resources = queryset.all()
         return [r.to_dict() for r in resources]
+
+    def _export(self, collection):
+        """Return a CSV of the resources in *collection*.
+
+        :param list collection: A list of resources represented by dicts
+        """
+        fieldnames = collection[0].keys()
+        csvfile = cStringIO.StringIO()
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(collection)
+        response = make_response(csvfile.getvalue())
+        csvfile.close()
+        response.mimetype = 'text/csv'
+        return response
+
 
     @staticmethod
     def _no_content_response():

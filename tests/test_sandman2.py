@@ -37,6 +37,15 @@ def test_get_collection(client):
     assert response.headers['ETag'] in COLLECTION_ETAGS
 
 
+def test_export_collection(client):
+    """Can we export a collection of resources properly?"""
+    response = client.get('/genre/?export=True')
+    assert response.status_code == 200
+    data = response.get_data(as_text=True)
+    assert len(data) == 354
+    assert response.headers['Content-type'] == 'text/csv; charset=utf-8'
+
+
 def test_post(client):
     """Can we POST a new resource properly?"""
     response = client.post(

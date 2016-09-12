@@ -47,6 +47,7 @@ def get_app(
     app = Flask('sandman2')
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
     app.config['SANDMAN2_READ_ONLY'] = read_only
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.classes = []
     db.init_app(app)
     admin = Admin(app, base_template='layout.html', template_mode='bootstrap3')
