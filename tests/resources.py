@@ -21,12 +21,13 @@ COLLECTION_ETAGS = (
     '"f8d044bc2810a3758722557101e1f4a2"',
     '"8527642c9c0fbbd6807e49c30d93a2c6"',
     '"90f8a11222df8b83d6f1cee626a154a5"',
+    '"c59f5215ea673b399145eccfcbb3e89c"',
 )
 
 
 NEW_ARTIST = {
     'Name': 'Jeff Knupp',
-    'ArtistId': 276,
+    'ArtistId': 277,
 }
 
 REPLACED_ARTIST = {

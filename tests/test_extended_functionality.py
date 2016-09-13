@@ -38,7 +38,7 @@ def test_sorting(client):
     """Do we return sorted results when a 'sort' URL parameter is provided?"""
     response = client.get('/artist/?sort=Name')
     assert response.status_code == 200
-    assert len(response.json['resources']) == 275
+    assert len(response.json['resources']) == 276
     assert response.json['resources'][0]['ArtistId'] == 43
 
 

@@ -32,7 +32,7 @@ def test_get_collection(client):
     assert response.status_code == 200
     json_response = json.loads(
         response.get_data(as_text=True))['resources']
-    assert len(json_response) == 275
+    assert len(json_response) == 276
     assert response.headers['Content-type'] == 'application/json'
     assert response.headers['ETag'] in COLLECTION_ETAGS
 
@@ -102,10 +102,10 @@ def test_put_existing(client):
 
 def test_put_new(client):
     """Can we PUT a resource at *new* ID?"""
-    response = client.get('/artist/276')
+    response = client.get('/artist/277')
     assert response.status_code == 404
     response = client.put(
-        '/artist/276',
+        '/artist/277',
         data=json.dumps(NEW_ARTIST),
         headers={'Content-type': 'application/json'}
         )
