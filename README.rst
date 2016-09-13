@@ -3,6 +3,8 @@ sandman2
 
 |Build Status| |Coverage Status|
 
+`sandman2 documentation <http://sandman2.readthedocs.io/en/latest/>`__
+
 sandman2 automagically generates a RESTful API service from your
 existing database, without requiring you to write a line of code. Simply
 point sandman2 to your database, add salt for seasoning, and voila!, a
@@ -33,9 +35,9 @@ RESTful API, and starts the server.
 What Happened to Sandman (1)?
 -----------------------------
 
-`sandman <http://www.github.com/jeffknupp/sandman>`_, the precursor
-to ``sandman2``, is no longer being maintianed. ``sandman`` had almost
-identical functionality but had an architecutre that reflected the
+```sandman`` <http://www.github.com/jeffknupp/sandman>`__, the precursor
+to ``sandman2``, is no longer being maintained. ``sandman`` had almost
+identical functionality but had an architecture that reflected the
 capabilities of the underlying ORM, SQLAlchemy. As of the ``0.9``
 release, SQLAlchemy introduced the ``automap`` construct. This
 fundamentally changed the way that ``sandman`` *could* interact with the
@@ -57,7 +59,7 @@ Quickstart
 Install sandman2 using ``pip``: ``$ pip install sandman2``. This
 provides the script ``sandman2ctl``, which just takes the database URI
 string, described
-`here <http://docs.sqlalchemy.org/en/rel_0_9/core/engines.html>`_. For
+`here <http://docs.sqlalchemy.org/en/rel_0_9/core/engines.html>`__. For
 example, to connect to a SQLite database in the same directory you're
 running the script, you would run:
 
@@ -73,7 +75,7 @@ To connect to a PostgreSQL database, make sure you install a driver like
     $ sandman2ctl postgresql+psycopg2://scott:tiger@localhost/mydatabase
 
 Again, see `the SQLAlchemy
-documentation <http://docs.sqlalchemy.org/en/rel_0_9/core/engines.html>`_
+documentation <http://docs.sqlalchemy.org/en/rel_0_9/core/engines.html>`__
 for a more comprehensive discussion of connection strings.
 
 Supported Databases
@@ -102,7 +104,7 @@ Admin Interface
 ---------------
 
 One of the best things about the original
-`sandman <http://www.github.com/jeffknupp/sandman>`_ was the *Admin
+`sandman <http://www.github.com/jeffknupp/sandman>`__ was the *Admin
 Interface*. Not only does sandman2 include the Admin Interface, but it
 modernize's it as well. The layout has been greatly improved, especially
 when dealing with larger numbers of tables. All of the original
@@ -110,7 +112,7 @@ functionality of the Admin Interface remains unchanged.
 
 Here's a shot of the new look:
 
-.. figure:: https://camo.githubusercontent.com/8d6b264ee78bcaef0621a7c399f9617a42defb6e/687474703a2f2f6a6566666b6e7570702e636f6d2f696d616765732f61646d696e2d766965772e706e67
+.. figure:: http://jeffknupp.com/images/admin-view.png
    :alt: admin interface awesomesauce screenshot
 
    admin interface awesomesauce screenshot
@@ -125,5 +127,5 @@ into your application. See the documentation for more info.
 
 .. |Build Status| image:: https://travis-ci.org/jeffknupp/sandman2.svg?branch=master
    :target: https://travis-ci.org/jeffknupp/sandman2
-.. |Coverage Status| image:: https://img.shields.io/coveralls/jeffknupp/sandman2.svg
-   :target: https://coveralls.io/r/jeffknupp/sandman2?branch=master
+.. |Coverage Status| image:: https://coveralls.io/repos/jeffknupp/sandman2/badge.svg?branch=master&service=github
+   :target: https://coveralls.io/github/jeffknupp/sandman2?branch=master
