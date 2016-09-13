@@ -13,6 +13,7 @@ Contents:
 
    Quickstart <quickstart>
    Interacting With Your sandman2 API <interacting>
+   Sandman2 Admin <admin>
    API <sandman2>
 
 

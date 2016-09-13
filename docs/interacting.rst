@@ -12,12 +12,13 @@ Retrieve all records in a table
 In REST-terms, a table in your database represents a ``resource``. A *group* of
 resources (i.e. data returned from a ``SELECT * FROM foo`` statement)
 is called a ``collection``. To retrieve a ``collection`` of resources from your
-API, make a HTTP ``GET`` call to the resource's base URL. By default, this is
-set to ``/<table_name_in_lowercase>``. If you had an ``Artist`` table in your
+API, make a HTTP ``GET`` call to the resource's base URL with a trailing ``/``.
+The ``/`` indicates that this URL represents a ``collection`` rather than a single ``resource``.
+By default, a ``resource``'s base URL is set to ``/<table_name_in_lowercase>/``. If you had an ``Artist`` table in your
 database, you would use the following ``curl`` command to retrieve the collection 
 of all ``Artist`` resources::
 
-    $ curl http://127.0.0.1:5000/artist
+    $ curl http://127.0.0.1:5000/artist/
 
 The implied HTTP method in this case is ``GET``. The response would be a JSON list of
 all the artist resources in the database.
@@ -34,7 +35,7 @@ Retrieve a single row
 
 To retrieve a single resource (i.e. row in your database), use the ``GET``
 method while specifying the value of the resource's primary key field. If our
-``Artist`` table used the column ``ArtistId`` as a primary key, we could
+``Artist`` table used the column ``ArtistId`` (an ``integer``) as a primary key, we could
 retrieve a single resource like so::
 
     $ curl http://127.0.0.1:5000/artist/3
@@ -51,19 +52,24 @@ Add a new row to a table
 ------------------------
 
 To add a resource to an existing collection, use the HTTP ``POST`` method on the
-collection's URL (e.g. ``/artist`` in our example). All required fields should
+collection's URL (e.g. ``/artist/`` in our example). All required fields should
 be sent as JSON data, and the ``Content-type`` header should be set to
 ``application/json``. Here's how we would create a new ``artist`` resource::
 
-    $ curl -X POST -d '{"Name": "Jeff Knupp"}' -H "Content-Type: application/json" http://127.0.0.1:5000/artist
+    $ curl -X POST -d '{"Name": "Jeff Knupp"}' -H "Content-Type: application/json" http://127.0.0.1:5000/artist/
 
 In this case, the primary key field (``ArtistId``) was not sent, since it is an
-auto-incremented integer. The response shows the assigned ``ArtistId``::
+auto-incremented ``integer``. The response shows the assigned ``ArtistId``::
 
     {
         "ArtistId": 276,
         "Name": "Jeff Knupp"
     }
+
+We know based on our knowledge of how ``sandman2`` works that this new resource can be retrieved at ``/artist/276``
+(i.e. <resource name>/<primary key value>). If we didn't know how ``sandman2`` worked, however, how would we know
+*where* the new resource was located? The ``Link`` HTTP response header always indicates the location a resource can be
+reached at, among other things.
 
 Possible HTTP status codes for response
 ```````````````````````````````````````
@@ -110,9 +116,8 @@ Possible HTTP status codes for response
 Update an existing row
 ----------------------
 
-To update a row, send an HTTP ``PATCH`` request to the service containing only
-the fields and values you want to change. To change the ``ArtistId`` associated
-with an album, you could send the following ``PATCH`` request::
+To update a row using the so-called "delta", i.e. just the fields that must be changed, send an HTTP ``PATCH`` request to the service.
+To change the ``ArtistId`` associated with an album, you could send the following ``PATCH`` request::
 
     $ curl -X PATCH -d '{"ArtistId": 3}' -H "Content-Type: application/json" http://127.0.0.1:5000/album/6
 

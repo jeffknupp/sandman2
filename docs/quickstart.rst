@@ -22,7 +22,7 @@ By default, all database tables will be introspected and made available
 as API resources (don't worry if this is not the behavior desired; there are easy ways to
 configure the exact behavior of ``sandman2``, discussed later in the documentation).
 The default URL for each table is a slash followed by the table's name in all 
-lower case (e.g. an "Artist" table would be found at ``localhost:5000/artist``).
+lower case (e.g. an "Artist" table would be found at ``localhost:5000/artist/``).
 
 Using Your New REST API
 -----------------------
