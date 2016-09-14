@@ -156,3 +156,67 @@ Possible HTTP status codes for response
 * ``200 OK`` if the resource was found and updated
 * ``201 Created`` if the resource was not found and a new resource was created
 * ``400 Bad Request`` if the request is malformed or missing data
+
+Searching, Filtering, and Sorting
+=================================
+
+Pagination
+----------
+
+When you perform an HTTP GET ``request`` on a collection, the default behavior is to return *all* of the results in the
+collection, though these results are *paginated*. _Pagination_ breaks up a long list of results into identicallly-sized chunks, called *pages*. Each page contains a predetermined number of results (``sandman2`` uses a default size of ``20``). Each paged response also contains a ``Link`` header that will include the URL for the previous, next, first, and last page of results (where applicable).
+
+Controlling pagination
+``````````````````````
+
+Pagination options are controlled by a number of optional URL parameters:
+
+* ``page (integer)``: Return the *Nth* page of results. With 100 results and a page size of 20, ``page=2`` would result
+  in resources 21-40 being returned.
+* ``limit (integer)``: Set the number of results per page to *N*. With 100 results and a page size of 20, ``limit=10``
+  would return only the first 10 results.
+
+Filtering
+---------
+
+One can *filter* the resources that will be returned from a ``GET`` request for a collection. Filtering is done on the
+value of one or more of the fields in a resource. For example, suppose we had a ``Person`` resource with ``first_name``,
+``last_name``, and ``age`` fields. To request only the resources where the person's ``first_name`` is "Jeff", you would
+make an HTTP ``GET`` request to the following URL:
+
+    ``/person/?first_name=Jeff``
+
+Notice that ``person`` is followed by a ``/``, indicating it is a collection and not a resource. ``first_name`` is
+simply set as a URL parameter with the value set to "Jeff".
+
+Combining filters
+`````````````````
+
+When more than one filter is specified on a request, the filters are combined and taken to be a set of clauses joined by
+AND. That is, a resource must match *all* filters to be returned, not just one. This behavior is useful for further
+refining results:
+
+    ``/person/?first_name=Jeff&last_name=Knupp``
+
+A ``GET`` request to this URL will return only the resources where ``first_name`` is "Jeff" *and* ``last_name`` is
+"Knupp". We could also specify an age to filter on, though only exact matches (e.g. ``age=33`` vs ``age<40``) are
+currently supported for non-text fields.
+
+Filtering text fields with pattern matching
+```````````````````````````````````````````
+
+Suppose we want ``Person`` resources not with a specific ``first_name``, but where the ``first_name`` begins with ``J``.
+We can specify a "like" parameter (named after the SQL ``LIKE`` keyword) by sending a ``GET`` request to:
+
+    ``/person/?%name=J%%``
+
+    (Note that the ``%`` character must be URL-escaped)
+
+The double ``%`` s mean "match any series of characters", so our filter is "first_name starting with J and followed by
+any series of characters."
+
+Sorting
+-------
+
+The last type of operation that controls how/which resources are returned from a collection is *sorting*. A collection
+can be sorted by any field on the resource
