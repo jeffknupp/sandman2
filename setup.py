@@ -36,7 +36,7 @@ class PyTest(TestCommand):
 
 setup(
     name='sandman2',
-    version='1.0.2',
+    version='1.0.3',
     url='http://github.com/jeffknupp/sandman2/',
     license='Apache Software License',
     author='Jeff Knupp',
@@ -55,10 +55,10 @@ setup(
     long_description=LONG_DESCRIPTION,
     entry_points={
         'console_scripts': [
-            'sandman2ctl = scripts.sandman2ctl:main',
+            'sandman2ctl = sandman2.scripts.sandman2ctl:main',
             ],
         },
-    packages=['sandman2', 'scripts'],
+    packages=['sandman2'],
     include_package_data=True,
     platforms='any',
     test_suite='tests.test_sandman2',
