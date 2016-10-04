@@ -179,7 +179,7 @@ def _register_user_models(user_models, admin=None, schema=None):
     :param list user_models: A list of user-defined models to include in the
                              API service
     """
-    if any([True for cls in user_models if issubclass(cls, AutomapModel)]):
+    if any([issubclass(cls, AutomapModel) for cls in user_models]):
         AutomapModel.prepare(  # pylint:disable=maybe-no-member
                                db.engine, reflect=True, schema=schema)
 
