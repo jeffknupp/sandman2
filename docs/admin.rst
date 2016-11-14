@@ -1,9 +1,9 @@
 The Admin Interface
 ===================
 
-In addition to a RESTful API service, sandman2 provides and HTML-based *admin interface*
+In addition to a RESTful API service, sandman2 provides a HTML-based *admin interface*
 that allows you to view and manipulate the data in your tables. To access the
-admin interface, simplay navigate to ``/admin`` once your service is started.
+admin interface, simply navigate to ``/admin`` once your service is started.
 
 On the left sidebar, you'll see a list of all the services you specified (i.e.
 the database tables you chose to include). Clicking one will show the contents
