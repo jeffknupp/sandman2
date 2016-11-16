@@ -12,7 +12,7 @@ from sandman2.model import db
 from sandman2.decorators import etag, validate_fields
 
 
-def add_link_headers(response, links):
+def add_resource_link_headers(response, links):
     """Return *response* with the proper link headers set, based on the contents
     of *links*.
 
@@ -21,9 +21,28 @@ def add_link_headers(response, links):
     :param dict links: Dictionary of links to be added
     :rtype :class:`flask.Response` :
     """
-    link_string = '<{}>; rel=self'.format(links['self'])
+    link_string = '<{}>; rel="self"'.format(links['self'])
     for link in links.values():
-        link_string += ', <{}>; rel=related'.format(link)
+        link_string += ', <{}>; rel="related"'.format(link)
+    response.headers['Link'] = link_string
+    return response
+
+def add_collection_link_headers(response, pagination, base):
+    """Return *response* with the proper link headers set, based on the *pagination* values.
+
+    :param response: :class:`flask.Response` response object for links to be
+                     added
+    :param pagination: SQLAlchemy pagination object
+    :rtype :class:`flask.Response` :
+    """
+    links = {
+         'next': pagination.next_num,
+         'prev': pagination.prev_num,
+         'last': pagination.pages,
+    }
+    link_string = '<{}?page={}>; rel="{}"'.format(base, links['next'], 'next')
+    link_string += ', <{}?page={}>; rel="{}"'.format(base, links['prev'], 'prev')
+    link_string += ', <{}?page={}>; rel="{}"'.format(base, links['last'], 'last')
     response.headers['Link'] = link_string
     return response
 
@@ -36,7 +55,7 @@ def jsonify(resource):
     """
 
     response = flask.jsonify(resource.to_dict())
-    response = add_link_headers(response, resource.links())
+    response = add_resource_link_headers(response, resource.links())
     return response
 
 
@@ -96,11 +115,14 @@ class Service(MethodView):
                 raise BadRequestException(error_message)
 
             if 'export' in request.args: 
-                return self._export(self._all_resources())
+                return self._export([e.to_dict() for e in self._all_resources().items])
 
-            return flask.jsonify({
-                self.__json_collection_name__: self._all_resources()
+            pagination = self._all_resources()
+            resources = [resource.to_dict() for resource in pagination.items]
+            response = flask.jsonify({
+                self.__json_collection_name__: resources
                 })
+            return add_collection_link_headers(response, pagination, self.__model__.__url__)
         else:
             resource = self._resource(resource_id)
             error_message = is_valid_method(self.__model__, resource)
@@ -199,8 +221,7 @@ class Service(MethodView):
         return resource
 
     def _all_resources(self):
-        """Return the complete collection of resources as a list of
-        dictionaries.
+        """Return the complete collection of resources as a paginated query.
 
         :rtype: :class:`sandman2.model.Model`
         """
@@ -222,11 +243,7 @@ class Service(MethodView):
                 else:
                     raise BadRequestException('Invalid field [{}]'.format(key))
                 queryset = queryset.filter(*filters).order_by(*order).limit(limit)
-        if 'page' in request.args:
-            resources = queryset.paginate(int(request.args['page'])).items
-        else:
-            resources = queryset.all()
-        return [r.to_dict() for r in resources]
+        return queryset.paginate(int(request.args.get('page', 1)))
 
     def _export(self, collection):
         """Return a CSV of the resources in *collection*.
