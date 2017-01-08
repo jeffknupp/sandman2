@@ -20,6 +20,9 @@ from sandman2.model import db, Model, AutomapModel
 from sandman2.admin import CustomAdminView
 from flask_admin import Admin
 from flask_httpauth import HTTPBasicAuth
+from apispec import APISpec
+from flask_apispec import marshal_with, use_kwargs
+from flask_apispec.extension import FlaskApiSpec
 
 # Augment sandman2's Model class with the Automap and Flask-SQLAlchemy model
 # classes
@@ -52,12 +55,26 @@ def get_app(
     db.init_app(app)
     admin = Admin(app, base_template='layout.html', template_mode='bootstrap3')
     _register_error_handlers(app)
+    spec = APISpec(
+        title='REST API',
+        version='v1',
+        plugins=[
+        'apispec.ext.marshmallow',
+        'apispec.ext.flask',
+        ]
+    )
+    app.config['APISPEC_SPEC'] = spec
+    docs = FlaskApiSpec(app)
     if user_models:
         with app.app_context():
-            _register_user_models(user_models, admin, schema=schema)
+            _register_user_models(user_models, admin, schema=schema, docs=docs)
     elif reflect_all:
         with app.app_context():
-            _reflect_all(exclude_tables, admin, read_only, schema=schema)
+            _reflect_all(exclude_tables, admin, read_only, schema=schema, docs=docs)
+    with app.app_context():
+        for service_class in app.classes:
+            print app.url_map
+            docs.register(service_class, endpoint=service_class.__name__.lower())
 
     @app.route('/')
     def index():
@@ -104,7 +121,7 @@ def register_service(cls, primary_key_type):
 
     if 'GET' in methods:  # pylint: disable=no-member
         current_app.add_url_rule(
-            cls.__model__.__url__ + '/', defaults={'resource_id': None},
+            cls.__model__.__url__ + '/',
             view_func=view_func,
             methods=['GET'])
         current_app.add_url_rule(
@@ -123,7 +140,7 @@ def register_service(cls, primary_key_type):
     current_app.classes.append(cls)
 
 
-def _reflect_all(exclude_tables=None, admin=None, read_only=False, schema=None):
+def _reflect_all(exclude_tables=None, admin=None, read_only=False, schema=None, docs=None):
     """Register all tables in the given database as services.
 
     :param list exclude_tables: A list of tables to exclude from the API
@@ -136,20 +153,24 @@ def _reflect_all(exclude_tables=None, admin=None, read_only=False, schema=None):
             continue
         if read_only:
             cls.__methods__ = {'GET'}
-        register_model(cls, admin)
+        register_model(cls, admin, docs)
 
 
-def register_model(cls, admin=None):
+def register_model(cls, admin=None, docs=None):
     """Register *cls* to be included in the API service
 
     :param cls: Class deriving from :class:`sandman2.models.Model`
     """
     cls.__url__ = '/{}'.format(cls.__name__.lower())
+    schema_class = cls.schema()
+
     service_class = type(
         cls.__name__ + 'Service',
         (Service,),
         {
             '__model__': cls,
+            '__schema_class__': schema_class,
+            'decorators': [marshal_with(schema_class), use_kwargs(schema_class)],
         })
 
     # inspect primary key
@@ -173,7 +194,7 @@ def register_model(cls, admin=None):
         admin.add_view(CustomAdminView(cls, db.session))
 
 
-def _register_user_models(user_models, admin=None, schema=None):
+def _register_user_models(user_models, admin=None, schema=None, docs=None):
     """Register any user-defined models with the API Service.
 
     :param list user_models: A list of user-defined models to include in the
@@ -184,4 +205,4 @@ def _register_user_models(user_models, admin=None, schema=None):
                                db.engine, reflect=True, schema=schema)
 
     for user_model in user_models:
-        register_model(user_model, admin)
+        register_model(user_model, admin, docs)

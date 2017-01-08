@@ -5,12 +5,20 @@ import datetime
 from decimal import Decimal
 
 # Third-party imports
+from marshmallow import Schema, fields
 from sqlalchemy.inspection import inspect
+from sqlalchemy.sql import sqltypes
 from flask_sqlalchemy import SQLAlchemy  # pylint: disable=import-error,no-name-in-module
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.ext.declarative import declarative_base
 
 db = SQLAlchemy()
+
+def column_to_field_type(column_type):
+    if isinstance(column_type, sqltypes.Integer): return fields.Int
+    elif isinstance(column_type, sqltypes.String): return fields.Str
+    elif isinstance(column_type, sqltypes.Float): return fields.Float
+    elif isinstance(column_type, sqltypes.Boolean): return fields.Bool
 
 class Model(object):
 
@@ -86,6 +94,20 @@ class Model(object):
             elif isinstance(value, datetime.datetime):
                 result_dict[column] = value.isoformat()
         return result_dict
+
+    @classmethod
+    def schema(cls):
+        """Return a ``Schema`` object describing the fields of this model.
+
+        :rtype: :class:`marmallow.Schema`
+        """
+        namespace = {}
+        for column in cls.__table__.columns:
+            print(column, column.type, type(column.type))
+            field_type = column_to_field_type(column.type)
+            namespace[column.name] = field_type
+        namespace['resource_id'] = column_to_field_type(list(cls.__table__.primary_key.columns)[0].type)
+        return type(str(cls.__table__.name.capitalize() + 'Schema'), tuple(), namespace)
 
     def links(self):
         """Return a dictionary of links to related resources that should be

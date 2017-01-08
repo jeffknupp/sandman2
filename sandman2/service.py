@@ -5,6 +5,7 @@ ORM models or a database introspection."""
 from flask import request, make_response
 import flask
 from flask.views import MethodView
+from flask_apispec.views import MethodResource
 
 # Application imports
 from sandman2.exception import NotFoundException, BadRequestException
@@ -48,7 +49,7 @@ def is_valid_method(model, resource=None):
     if hasattr(model, validation_function_name):
         return getattr(model, validation_function_name)(request, resource)
 
-class Service(MethodView):
+class Service(MethodResource):
 
     """The *Service* class is a generic extension of Flask's *MethodView*,
     providing default RESTful functionality for a given ORM resource.
@@ -79,7 +80,7 @@ class Service(MethodView):
         return self._no_content_response()
 
     @etag
-    def get(self, resource_id=None):
+    def get(self, resource_id=None, **kwargs):
         """Return an HTTP response object resulting from an HTTP GET call.
 
         If *resource_id* is provided, return just the single resource.
@@ -108,7 +109,7 @@ class Service(MethodView):
                 raise BadRequestException(error_message)
             return jsonify(resource)
 
-    def patch(self, resource_id):
+    def patch(self, resource_id, **kwargs):
         """Return an HTTP response object resulting from an HTTP PATCH call.
 
         :returns: ``HTTP 200`` if the resource already exists
@@ -128,7 +129,7 @@ class Service(MethodView):
         return jsonify(resource)
 
     @validate_fields
-    def post(self):
+    def post(self, **kwargs):
         """Return the JSON representation of a new resource created through
         an HTTP POST call.
 
@@ -151,7 +152,7 @@ class Service(MethodView):
         db.session().commit()
         return self._created_response(resource)
 
-    def put(self, resource_id):
+    def put(self, resource_id, **kwargs):
         """Return the JSON representation of a new resource created or updated
         through an HTTP PUT call.
 
