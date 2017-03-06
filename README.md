@@ -96,4 +96,4 @@ Here's a shot of the new look:
 If `sandman2ctl` doesn't give you fine-grained enough control over your REST
 endpoints, or you'd like to restrict the set of tables made available via
 `sandman2ctl`, you can easily integrate `sandman2` into your application. See
-the documentation for more info.
+the [documentation](http://sandman2.readthedocs.io/en/latest/) for more info.
