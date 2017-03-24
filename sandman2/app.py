@@ -50,7 +50,7 @@ def get_app(
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.classes = []
     db.init_app(app)
-    admin = Admin(app, base_template='layout.html', template_mode='bootstrap3')
+    admin = Admin(app, template_mode='bootstrap3')
     _register_error_handlers(app)
     if user_models:
         with app.app_context():
