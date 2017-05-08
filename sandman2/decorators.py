@@ -4,7 +4,7 @@ import hashlib
 from flask import jsonify, request, make_response
 
 from sandman2.exception import BadRequestException
-
+from sqlalchemy.exc import IntegrityError
 
 def etag(func):
     """Return a decorator that generates proper ETag values for a response.
@@ -68,5 +68,8 @@ def validate_fields(func):
         for required in set(instance.__model__.required()):
             if required not in data:
                 raise BadRequestException('[{}] required'.format(required))
-        return func(instance, *args, **kwargs)
+        try:
+            return func(instance, *args, **kwargs)
+        except IntegrityError as e:
+            raise BadRequestException("{}".format(e.message.split(",")[1].strip("\)\" ")))
     return decorated
