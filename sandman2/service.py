@@ -206,25 +206,26 @@ class Service(MethodView):
         """
         queryset = self.__model__.query
         args = {k: v for (k, v) in request.args.items() if k not in ('page', 'export')}
+        limit = None
         if args:
             filters = []
             order = []
-            limit = None
             for key, value in args.items():
                 if value.startswith('%'):
                     filters.append(getattr(self.__model__, key).like(str(value), escape='/'))
                 elif key == 'sort':
                     order.append(getattr(self.__model__, value))
                 elif key == 'limit':
-                    limit = value
+                    limit = int(value)
                 elif hasattr(self.__model__, key):
                     filters.append(getattr(self.__model__, key) == value)
                 else:
                     raise BadRequestException('Invalid field [{}]'.format(key))
-                queryset = queryset.filter(*filters).order_by(*order).limit(limit)
+                queryset = queryset.filter(*filters).order_by(*order)
         if 'page' in request.args:
-            resources = queryset.paginate(int(request.args['page'])).items
+            resources = queryset.paginate(page=int(request.args['page']), per_page=limit).items
         else:
+            queryset = queryset.limit(limit)
             resources = queryset.all()
         return [r.to_dict() for r in resources]
 
