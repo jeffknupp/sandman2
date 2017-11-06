@@ -10,3 +10,5 @@ dist
 .tox
 build
 *.bak
+.idea
+.cache
