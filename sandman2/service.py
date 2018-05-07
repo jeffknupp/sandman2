@@ -5,6 +5,7 @@ ORM models or a database introspection."""
 from flask import request, make_response
 import flask
 from flask.views import MethodView
+from sqlalchemy import asc, desc
 
 # Application imports
 from sandman2.exception import NotFoundException, BadRequestException
@@ -214,7 +215,8 @@ class Service(MethodView):
                 if value.startswith('%'):
                     filters.append(getattr(self.__model__, key).like(str(value), escape='/'))
                 elif key == 'sort':
-                    order.append(getattr(self.__model__, value))
+                    direction = desc if value.startswith('-') else asc
+                    order.append(direction(getattr(self.__model__, value.lstrip('-'))))
                 elif key == 'limit':
                     limit = value
                 elif hasattr(self.__model__, key):

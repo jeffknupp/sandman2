@@ -42,6 +42,14 @@ def test_sorting(client):
     assert response.json['resources'][0]['ArtistId'] == 43
 
 
+def test_sorting_descending(client):
+    """Can we sort results in descending order?"""
+    response = client.get('/artist/?sort=-Name')
+    assert response.status_code == 200
+    assert len(response.json['resources']) == 276
+    assert response.json['resources'][0]['ArtistId'] == 155
+
+
 def test_limit(client):
     """Do we return sorted results when a 'limit' URL parameter is provided?"""
     response = client.get('/artist/?limit=5')
