@@ -14,6 +14,7 @@ RESOURCE_ETAGS = (
     '"8a4a9037a1eb0a50ed7f8d523e05cfcb"',
     '"7bcefa90a6faacf8460b00f0bb217388"',
     '"8527642c9c0fbbd6807e49c30d93a2c6"',
+    '"d7078e022cb3398329a4254468c80fad"',
 )
 
 COLLECTION_ETAGS = (
@@ -22,6 +23,7 @@ COLLECTION_ETAGS = (
     '"8527642c9c0fbbd6807e49c30d93a2c6"',
     '"90f8a11222df8b83d6f1cee626a154a5"',
     '"c59f5215ea673b399145eccfcbb3e89c"',
+    '"207ab6c6190915dbde0cba288e5ce35d"',
 )
 
 
