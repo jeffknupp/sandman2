@@ -31,7 +31,9 @@ def get_app(
         user_models=None,
         reflect_all=True,
         read_only=False,
-        schema=None):
+        schema=None,
+        config=None,
+        ):
     """Return an application instance connected to the database described in
     *database_uri*.
 
@@ -43,6 +45,7 @@ def get_app(
     :param bool reflect_all: Include all database tables in the API service
     :param bool read_only: Only allow HTTP GET commands for all endpoints
     :param str schema: Use the specified named schema instead of the default
+    :param str config: Use the specified config file to map table names to a proper string representation
     """
     app = Flask('sandman2')
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
@@ -57,7 +60,7 @@ def get_app(
             _register_user_models(user_models, admin, schema=schema)
     elif reflect_all:
         with app.app_context():
-            _reflect_all(exclude_tables, admin, read_only, schema=schema)
+            _reflect_all(exclude_tables, admin, read_only, schema=schema, config=config)
 
     @app.route('/')
     def index():
@@ -123,15 +126,34 @@ def register_service(cls, primary_key_type):
     current_app.classes.append(cls)
 
 
-def _reflect_all(exclude_tables=None, admin=None, read_only=False, schema=None):
+def _reflect_all(exclude_tables=None, admin=None, read_only=False, schema=None, config=None):
     """Register all tables in the given database as services.
 
     :param list exclude_tables: A list of tables to exclude from the API
                                 service
+    :param ``FlaskAdmin`` admin: An optional instance of ``FlaskAdmin`` if the admin interface
+                                 will be used
+    :param bool read_only: If True, only HTTP GET methods will be supported, preventing
+                           data modificiation in the database
+    :param str schema: Use the specified named schema instead of the default
+    :param str names: Use the specified *names* file to map table names to a proper string representation
     """
     AutomapModel.prepare(  # pylint:disable=maybe-no-member
         db.engine, reflect=True, schema=schema)
+    if config:
+        try:
+            import sys
+            import os
+            sys.path.insert(0, os.path.abspath(os.curdir))
+            from names import MODEL_NAMES
+        except ImportError:
+            print('Invalid config file specified [{}]'.format(config))
+            raise
     for cls in AutomapModel.classes:
+        table_name = cls.__table__.name
+        if config and str(table_name) in MODEL_NAMES:
+            name = MODEL_NAMES[table_name]
+            cls.__str__ = lambda self: getattr(cls, name)
         if exclude_tables and cls.__table__.name in exclude_tables:
             continue
         if read_only:

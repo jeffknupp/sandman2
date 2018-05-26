@@ -45,10 +45,16 @@ def main():
         '--schema',
         help='Use this named schema instead of default',
         default=None)
+    parser.add_argument(
+        '-c',
+        '--config',
+        help='Filename contianing mappings from tables to their string representation',
+        default='config.py')
+
 
 
     args = parser.parse_args()
-    app = get_app(args.URI, read_only=args.read_only, schema=args.schema)
+    app = get_app(args.URI, read_only=args.read_only, schema=args.schema, config=args.config)
     if args.debug:
         app.config['DEBUG'] = True
     if args.local_only:
