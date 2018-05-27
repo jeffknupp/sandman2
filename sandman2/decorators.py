@@ -65,8 +65,9 @@ def validate_fields(func):
                     instance.__model__.required() +
                     instance.__model__.optional()):
                 raise BadRequestException('Unknown field [{}]'.format(key))
-        for required in set(instance.__model__.required()):
-            if required not in data:
-                raise BadRequestException('[{}] required'.format(required))
+        missing = set(instance.__model__.required()) - set(data)
+        if missing:
+            message = 'The following required fields are missing: ' + ', '.join(missing)
+            raise BadRequestException(message)
         return func(instance, *args, **kwargs)
     return decorated
