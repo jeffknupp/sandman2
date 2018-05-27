@@ -138,5 +138,11 @@ class Model(object):
             description[column.name] = column_description
         return description
 
+
+    def __str__(self):
+        if hasattr(self, '_display_name'):
+            return getattr(self, self._display_name)
+        return self.__repr__()
+
 DeclarativeModel = declarative_base(cls=(db.Model, Model))
 AutomapModel = automap_base(DeclarativeModel)

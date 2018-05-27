@@ -152,8 +152,7 @@ def _reflect_all(exclude_tables=None, admin=None, read_only=False, schema=None, 
     for cls in AutomapModel.classes:
         table_name = cls.__table__.name
         if config and str(table_name) in MODEL_NAMES:
-            name = MODEL_NAMES[table_name]
-            cls.__str__ = lambda self: getattr(cls, name)
+            cls._display_name = MODEL_NAMES[table_name]
         if exclude_tables and cls.__table__.name in exclude_tables:
             continue
         if read_only:
