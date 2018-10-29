@@ -97,3 +97,31 @@ If `sandman2ctl` doesn't give you fine-grained enough control over your REST
 endpoints, or you'd like to restrict the set of tables made available via
 `sandman2ctl`, you can easily integrate `sandman2` into your application. See
 the [documentation](http://sandman2.readthedocs.io/en/latest/) for more info.
+
+## Running `sandman2` under Docker
+
+`sandman2` has an official docker image at [Docker Hub](https://hub.docker.com/r/sandman2/sandman2/). Simply `docker pull jeffknupp/sandman2` to get the latest version. It supports the most popular database engines, but not all that `sandman2` currently natively supports. If you'd like to see support for your RDBMS, either add a pull request on this repo (if possible) or create a new issue with the details of your database's Python driver.
+
+#### Example
+
+Here's how one would run `sandman2` to connect to a PostgreSQL database running on one's host machine (i.e. not a remote database, which is far simpler) under Docker **(on a Mac, explained below)**:
+
+1. `$ docker pull jeffknupp/sandman2`
+2. `$ docker run -d -e DB_TYPE=postgres -e DB_DRIVER=psycopg2 -e USERNAME=jknupp -e DB_HOST=host.docker.internal -e DATABASE=jknupp -e DB_PORT=5432 -p 9000:5000 sandman2`
+3. `$ curl localhost:9000/meta` or open a browser to `http://localhost:9000/admin/`
+
+*Note, `DB_HOST=host.docker.internal` is only necessary for databases that reside on the host system (and the value only works on macOS).* To connect to a database on a remote machine, simply replace that value with the machine's IP or hostname.
+
+#### Parameters
+
+Here are the parameters available to specify your connection information and their meaning:
+
+* `$DB_TYPE` - The type of RDBMS to connect to (e.g. `postgres` or `mysql`)
+* `$DB_DRIVER` - The name of the Python library to use as a driver (e.g. `psycopg2` or `pymysql`)
+* `$USERNAME` - Database username
+* `$PASSWORD` - Database password
+* `$DB_HOST` - Database IP or hostname
+* `$DB_PORT` - Database port
+* `$DATABASE` - Name of database to connect to
+
+Pass each value separately to the `docker run` command with `-e <VARIABLE>=<VALUE>`. Not all are required, but which ones are required differs based on your target RDBMS.
