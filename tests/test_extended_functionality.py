@@ -56,3 +56,11 @@ def test_limit(client):
     assert response.status_code == 200
     assert len(response.json['resources']) == 5
     assert response.json['resources'][0]['ArtistId'] == 1
+
+
+def test_sort_limit_and_pagination(client):
+    """Can we combine filtering parameters to get targeted results?"""
+    response = client.get('/artist/?limit=2&sort=ArtistId&page=2')
+    assert response.status_code == 200
+    assert len(response.json['resources']) == 2
+    assert response.json['resources'][0]['ArtistId'] == 3
