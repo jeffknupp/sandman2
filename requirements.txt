@@ -1,6 +1,6 @@
 Flask==1.0.2
 Flask-Admin==1.5.3
-Flask-SQLAlchemy==2.1
+Flask-SQLAlchemy==2.3.2
 SQLAlchemy==1.2.12
 WTForms==2.1
 coverage==4.1
