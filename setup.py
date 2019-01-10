@@ -36,17 +36,17 @@ class PyTest(TestCommand):
 
 setup(
     name='sandman2',
-    version='1.0.5',
+    version='1.2.0',
     url='http://github.com/jeffknupp/sandman2/',
     license='Apache Software License',
     author='Jeff Knupp',
-    tests_require=['pytest', 'pytest-cov', 'pytest-flask>=0.4.0'],
+    tests_require=['pytest', 'pytest-cov', 'pytest-flask==0.14.0'],
     install_requires=[
         'Flask>=1.0.2',
-        'Flask-SQLAlchemy>=1.0',
-        'SQLAlchemy==1.2.12',
-        'Flask-Admin>=1.0.9',
-        'Flask-HTTPAuth>=3.1.2',
+        'Flask-SQLAlchemy==2.3.2',
+        'SQLAlchemy==1.2.15',
+        'Flask-Admin>=1.5.3',
+        'Flask-HTTPAuth>=3.2.4',
         ],
     cmdclass={'test': PyTest},
     author_email='jeff@jeffknupp.com',
