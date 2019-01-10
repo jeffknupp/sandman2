@@ -100,7 +100,7 @@ the [documentation](http://sandman2.readthedocs.io/en/latest/) for more info.
 
 ## Running `sandman2` under Docker
 
-`sandman2` has an official docker image at [Docker Hub](https://hub.docker.com/r/sandman2/sandman2/). Simply `docker pull jeffknupp/sandman2` to get the latest version. It supports the most popular database engines, but not all that `sandman2` currently natively supports. If you'd like to see support for your RDBMS, either add a pull request on this repo (if possible) or create a new issue with the details of your database's Python driver.
+`sandman2` has an official docker image at [Docker Hub](https://hub.docker.com/r/jeffknupp/sandman2/). Simply `docker pull jeffknupp/sandman2` to get the latest version. It supports the most popular database engines, but not all that `sandman2` currently natively supports. If you'd like to see support for your RDBMS, either add a pull request on this repo (if possible) or create a new issue with the details of your database's Python driver.
 
 #### Example
 
