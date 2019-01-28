@@ -175,7 +175,7 @@ Pass each value separately to the ``docker run`` command with
 ``-e <VARIABLE>=<VALUE>``. Not all are required, but which ones are
 required differs based on your target RDBMS.
 
-.. |Build Status| image:: https://travis-ci.org/jeffknupp/sandman2.svg?branch=master
-   :target: https://travis-ci.org/jeffknupp/sandman2
+.. |Build Status| image:: https://travis-ci.com/jeffknupp/sandman2.svg?branch=master
+   :target: https://travis-ci.com/jeffknupp/sandman2
 .. |Coverage Status| image:: https://coveralls.io/repos/jeffknupp/sandman2/badge.svg?branch=master&service=github
    :target: https://coveralls.io/github/jeffknupp/sandman2?branch=master
