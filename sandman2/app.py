@@ -2,7 +2,10 @@
 
 # Third-party imports
 from flask import Flask, current_app, jsonify
+from marshmallow_sqlalchemy import ModelConversionError, ModelSchema
+from sqlalchemy import event
 from sqlalchemy.sql import sqltypes
+from sqlalchemy.orm import scoped_session, sessionmaker, mapper
 
 # Application imports
 from sandman2.exception import (
@@ -16,7 +19,7 @@ from sandman2.exception import (
     ServiceUnavailableException,
     )
 from sandman2.service import Service
-from sandman2.model import db, Model, AutomapModel
+from sandman2.model import db, ma, Model, AutomapModel
 from sandman2.admin import CustomAdminView
 from flask_admin import Admin
 from flask_httpauth import HTTPBasicAuth
@@ -50,6 +53,10 @@ def get_app(
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.classes = []
     db.init_app(app)
+    ma.init_app(app)
+    with app.app_context():
+        session = scoped_session(sessionmaker(bind=db.engine))
+        event.listen(mapper, 'after_configured', setup_schema(db.Model, session))
     admin = Admin(app, base_template='layout.html', template_mode='bootstrap3')
     _register_error_handlers(app)
     if user_models:
@@ -185,3 +192,32 @@ def _register_user_models(user_models, admin=None, schema=None):
 
     for user_model in user_models:
         register_model(user_model, admin)
+
+def setup_schema(Base, session):
+    # Create a function which incorporates the Base and session information
+    def setup_schema_fn():
+        for class_ in Base._decl_class_registry.values():
+            if hasattr(class_, '__tablename__'):
+                if class_.__name__.endswith('Schema'):
+                    raise ModelConversionError(
+                        "For safety, setup_schema can not be used when a"
+                        "Model class ends with 'Schema'"
+                    )
+
+                class Meta(object):
+                    model = class_
+                    sqla_session = session
+
+                schema_class_name = '%sSchema' % class_.__name__
+
+                schema_class = type(
+                    schema_class_name,
+                    (ma.ModelSchema,),
+                    {'Meta': Meta}
+                )
+
+                setattr(class_, '__marshmallow__', schema_class)
+
+    return setup_schema_fn
+
+

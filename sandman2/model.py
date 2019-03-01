@@ -5,12 +5,17 @@ import datetime
 from decimal import Decimal
 
 # Third-party imports
-from sqlalchemy.inspection import inspect
+from marshmallow import post_load
+from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy  # pylint: disable=import-error,no-name-in-module
+from sqlalchemy.inspection import inspect
+from sqlalchemy.sql.sqltypes import DateTime
+
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.ext.declarative import declarative_base
 
 db = SQLAlchemy()
+ma = Marshmallow()
 
 class Model(object):
 
@@ -110,7 +115,8 @@ class Model(object):
 
         """
         return self.__url__ + '/' + str(getattr(self, self.primary_key()))
-
+    
+    @post_load
     def update(self, attributes):
         """Update the current instance based on attribute->value items in
         *attributes*.
@@ -118,8 +124,15 @@ class Model(object):
         :param dict attributes: Dictionary of attributes to be updated
         :rtype: :class:`sandman2.model.Model`
         """
-        for attribute in attributes:
-            setattr(self, attribute, attributes[attribute])
+
+        column_types = self.__table__.columns  # pylint: disable=no-member
+        print(column_types)
+        for key, value in attributes.items():
+            if isinstance(value.type, Decimal):
+                value = float(value)
+            elif isinstance(value.type, DateTime):
+                value = value.isoformat()
+            setattr(self, key, value)
         return self
 
     @classmethod
