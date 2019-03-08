@@ -46,7 +46,7 @@ should be soon. Getting there is currently the top priority.
 ## Quickstart
 
 Install `sandman2` using `pip`: `$ pip install sandman2`. This provides the script
-`sandman2ctl`, which just takes the database URI string, described [here](http://docs.sqlalchemy.org/en/rel_0_9/core/engines.html). For example, to connect to a SQLite database in the same directory you're running the script, you would run:
+`sandman2ctl`, which just takes the database URI string, described [here](https://docs.sqlalchemy.org/en/latest/core/engines.html). For example, to connect to a SQLite database in the same directory you're running the script, you would run:
 
 ```bash
 $ sandman2ctl sqlite+pysqlite:///database_file_name
@@ -59,7 +59,7 @@ To connect to a PostgreSQL database, make sure you install a driver like
 $ sandman2ctl postgresql+psycopg2://scott:tiger@localhost/mydatabase
 ```
 
-Again, see [the SQLAlchemy documentation](http://docs.sqlalchemy.org/en/rel_0_9/core/engines.html)
+Again, see [the SQLAlchemy documentation](https://docs.sqlalchemy.org/en/latest/core/engines.html)
 for a more comprehensive discussion of connection strings.
 
 ## Supported Databases
