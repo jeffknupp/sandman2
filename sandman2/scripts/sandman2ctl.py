@@ -56,7 +56,7 @@ def main():
     else:
         host = '0.0.0.0'
     app.config['SECRET_KEY'] = '42'
-    app.run(host=host, port=int(args.port))
+    app.run(host=host, port=int(args.port), debug=args.debug)
 
 
 if __name__ == '__main__':

@@ -10,9 +10,11 @@ from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy  # pylint: disable=import-error,no-name-in-module
 from sqlalchemy.inspection import inspect
 from sqlalchemy.sql.sqltypes import DateTime
-
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.ext.declarative import declarative_base
+
+# Application imports
+from sandman2.exception import NotFoundException, BadRequestException
 
 db = SQLAlchemy()
 ma = Marshmallow()
@@ -116,7 +118,6 @@ class Model(object):
         """
         return self.__url__ + '/' + str(getattr(self, self.primary_key()))
     
-    @post_load
     def update(self, attributes):
         """Update the current instance based on attribute->value items in
         *attributes*.
@@ -125,14 +126,11 @@ class Model(object):
         :rtype: :class:`sandman2.model.Model`
         """
 
-        column_types = self.__table__.columns  # pylint: disable=no-member
-        print(column_types)
-        for key, value in attributes.items():
-            if isinstance(value.type, Decimal):
-                value = float(value)
-            elif isinstance(value.type, DateTime):
-                value = value.isoformat()
-            setattr(self, key, value)
+        attributes[self.primary_key()] = getattr(self, str(self.primary_key()))
+        result = self.__marshmallow__().load(attributes, session=db.session)
+        if result.errors:
+            raise BadRequestException(str(result.errors))
+        self = result.data
         return self
 
     @classmethod

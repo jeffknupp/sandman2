@@ -56,7 +56,7 @@ def get_app(
     ma.init_app(app)
     with app.app_context():
         session = scoped_session(sessionmaker(bind=db.engine))
-        event.listen(mapper, 'after_configured', setup_schema(db.Model, session))
+        event.listen(mapper, 'after_configured', setup_schema(AutomapModel, session))
     admin = Admin(app, base_template='layout.html', template_mode='bootstrap3')
     _register_error_handlers(app)
     if user_models:
@@ -197,6 +197,7 @@ def setup_schema(Base, session):
     # Create a function which incorporates the Base and session information
     def setup_schema_fn():
         for class_ in Base._decl_class_registry.values():
+            print(class_)
             if hasattr(class_, '__tablename__'):
                 if class_.__name__.endswith('Schema'):
                     raise ModelConversionError(

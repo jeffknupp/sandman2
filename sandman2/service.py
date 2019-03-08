@@ -36,7 +36,7 @@ def jsonify(resource):
     :param resource: The resource to act as the basis of the response
     """
 
-    response = flask.jsonify(resource.to_dict())
+    response = resource.__class__.__marshmallow__().jsonify(resource)
     response = add_link_headers(response, resource.links())
     return response
 
@@ -128,7 +128,6 @@ class Service(MethodView):
         db.session().commit()
         return jsonify(resource)
 
-    @validate_fields
     def post(self):
         """Return the JSON representation of a new resource created through
         an HTTP POST call.
@@ -144,7 +143,10 @@ class Service(MethodView):
                 raise BadRequestException(error_message)
             return self._no_content_response()
 
-        resource = self.__model__(**request.json)  # pylint: disable=not-callable
+        result = self.__model__.__marshmallow__().load(request.json, db.session)
+        if result.errors:
+            raise BadRequestException(str(result.errors))
+        resource = result.data
         error_message = is_valid_method(self.__model__, resource)
         if error_message:
             raise BadRequestException(error_message)
