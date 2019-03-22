@@ -36,12 +36,7 @@ functionality but had an architecture that reflected the capabilities of the und
 introduced the `automap` construct. This fundamentally changed the way that `sandman` *could* interact with the underlying database in a
 way that greatly simplified things. All that was needed was the actual effort to rewrite `sandman` from scratch...
 
-After wrestling with the idea for a while, I finally gave in and started the
-rewrite project. `sandman2` is that project. While I'll continue to support
-`sandman` in the nearterm, `sandman2` definitely represents the way forward.
-
-**NOTE**: `sandman2` is not yet at feature parity with the original `sandman`, but
-should be soon. Getting there is currently the top priority.
+`sandman2` has since surpassed the funcationality of the original `sandman` and the latter should be considered deprecated/obsolete.
 
 ## Quickstart
 
