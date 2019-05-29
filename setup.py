@@ -42,9 +42,9 @@ setup(
     author='Jeff Knupp',
     tests_require=['pytest', 'pytest-cov', 'pytest-flask==0.14.0'],
     install_requires=[
-        'Flask>=1.0.2',
-        'Flask-SQLAlchemy==2.3.2',
-        'SQLAlchemy==1.2.15',
+        'Flask>=1.0.3',
+        'Flask-SQLAlchemy==2.4.0',
+        'SQLAlchemy==1.3.3',
         'Flask-Admin>=1.5.3',
         'Flask-HTTPAuth>=3.2.4',
         ],
