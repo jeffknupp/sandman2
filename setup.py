@@ -13,8 +13,8 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 def read(*parts):
     """Return multiple read calls to different readable objects as a single
     string."""
-    # intentionally *not* adding an encoding option to open
-    return codecs.open(os.path.join(HERE, *parts), 'r').read()
+   
+    return codecs.open(os.path.join(HERE, *parts), 'r', encoding='utf-8').read()
 
 LONG_DESCRIPTION = read('README.rst')
 
