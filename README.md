@@ -11,7 +11,7 @@ hypermedia support starts running, ready to accept HTTP requests.
 
 This is a big deal. It means every single database you interact with, from the
 SQLite database that houses your web browser's data up to your production
-PostgreSQL server can be endowed with a REST API and accessed programatically,
+PostgreSQL server can be endowed with a REST API and accessed programmatically,
 using any number of HTTP client libraries available in *every* language.
 `sandman2` *frees your data*.
 
@@ -36,7 +36,7 @@ functionality but had an architecture that reflected the capabilities of the und
 introduced the `automap` construct. This fundamentally changed the way that `sandman` *could* interact with the underlying database in a
 way that greatly simplified things. All that was needed was the actual effort to rewrite `sandman` from scratch...
 
-`sandman2` has since surpassed the funcationality of the original `sandman` and the latter should be considered deprecated/obsolete.
+`sandman2` has since surpassed the functionality of the original `sandman` and the latter should be considered deprecated/obsolete.
 
 ## Quickstart
 
