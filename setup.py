@@ -54,10 +54,10 @@ setup(
     long_description=LONG_DESCRIPTION,
     entry_points={
         'console_scripts': [
-            'sandman2ctl = sandman2.scripts.sandman2ctl:main',
+            'sandman2ctl = sandman2.__main__:main',
             ],
         },
-    packages=['sandman2', 'sandman2.scripts'],
+    packages=['sandman2'],
     include_package_data=True,
     platforms='any',
     test_suite='tests.test_sandman2',
