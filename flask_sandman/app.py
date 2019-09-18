@@ -6,7 +6,7 @@ from sqlalchemy.sql import sqltypes
 
 # Application imports
 from flask_sandman.exception import register as register_exceptions
-from flask_sandman.service import Service
+from flask_sandman.service import Service, register as register_service
 from flask_sandman.database import DATABASE as db
 from flask_sandman.model import Model, AutomapModel
 from flask_sandman.admin import register as register_admin_view
@@ -61,37 +61,6 @@ def get_app(
                 cls.__model__.primary_key())
         return jsonify(routes)
     return app
-
-
-def register_service(cls, primary_key_type):
-    """Register an API service endpoint.
-
-    :param cls: The class to register
-    :param str primary_key_type: The type (as a string) of the primary_key
-                                 field
-    """
-    view_func = cls.as_view(cls.__name__.lower())  # pylint: disable=no-member
-    methods = set(cls.__model__.__methods__)  # pylint: disable=no-member
-
-    if 'GET' in methods:  # pylint: disable=no-member
-        current_app.add_url_rule(
-            cls.__model__.__url__ + '/', defaults={'resource_id': None},
-            view_func=view_func,
-            methods=['GET'])
-        current_app.add_url_rule(
-            '{resource}/meta'.format(resource=cls.__model__.__url__),
-            view_func=view_func,
-            methods=['GET'])
-    if 'POST' in methods:  # pylint: disable=no-member
-        current_app.add_url_rule(
-            cls.__model__.__url__ + '/', view_func=view_func, methods=['POST', ])
-    current_app.add_url_rule(
-        '{resource}/<{pk_type}:{pk}>'.format(
-            resource=cls.__model__.__url__,
-            pk='resource_id', pk_type=primary_key_type),
-        view_func=view_func,
-        methods=methods - {'POST'})
-    current_app.classes.append(cls)
 
 
 def _reflect_all(exclude_tables=None, admin=None, read_only=False, schema=None):

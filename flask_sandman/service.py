@@ -2,8 +2,8 @@
 ORM models or a database introspection."""
 
 # Third-party imports
-from flask import request, make_response
 import flask
+from flask import current_app, request, make_response
 from flask.views import MethodView
 from sqlalchemy import asc, desc
 
@@ -264,3 +264,34 @@ class Service(MethodView):
         response = jsonify(resource)
         response.status_code = 201
         return response
+
+
+def register(cls, primary_key_type):
+    """Register an API service endpoint.
+
+    :param cls: The class to register
+    :param str primary_key_type: The type (as a string) of the primary_key
+                                 field
+    """
+    view_func = cls.as_view(cls.__name__.lower())  # pylint: disable=no-member
+    methods = set(cls.__model__.__methods__)  # pylint: disable=no-member
+
+    if 'GET' in methods:  # pylint: disable=no-member
+        current_app.add_url_rule(
+            cls.__model__.__url__ + '/', defaults={'resource_id': None},
+            view_func=view_func,
+            methods=['GET'])
+        current_app.add_url_rule(
+            '{resource}/meta'.format(resource=cls.__model__.__url__),
+            view_func=view_func,
+            methods=['GET'])
+    if 'POST' in methods:  # pylint: disable=no-member
+        current_app.add_url_rule(
+            cls.__model__.__url__ + '/', view_func=view_func, methods=['POST', ])
+    current_app.add_url_rule(
+        '{resource}/<{pk_type}:{pk}>'.format(
+            resource=cls.__model__.__url__,
+            pk='resource_id', pk_type=primary_key_type),
+        view_func=view_func,
+        methods=methods - {'POST'})
+    current_app.classes.append(cls)
