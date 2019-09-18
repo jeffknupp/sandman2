@@ -3,14 +3,13 @@
 # Standard library imports
 import datetime
 from decimal import Decimal
-
-# Third-party imports
+# SQLAlchemy
 from sqlalchemy.inspection import inspect
-from flask_sqlalchemy import SQLAlchemy  # pylint: disable=import-error,no-name-in-module
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.ext.declarative import declarative_base
+# Application imports
+from .database import DATABASE as db
 
-db = SQLAlchemy()
 
 class Model(object):
 
@@ -138,5 +137,8 @@ class Model(object):
             description[column.name] = column_description
         return description
 
-DeclarativeModel = declarative_base(cls=(db.Model, Model))
+DeclarativeModel = declarative_base(cls=(db.Model, Model), name="AutomapModel")
 AutomapModel = automap_base(DeclarativeModel)
+
+
+__all__ = ["BaseModel", "AutomapModel"]

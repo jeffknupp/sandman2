@@ -7,7 +7,8 @@ from sqlalchemy.sql import sqltypes
 # Application imports
 from flask_sandman.exception import register as register_exceptions
 from flask_sandman.service import Service
-from flask_sandman.model import db, Model, AutomapModel
+from flask_sandman.database import DATABASE as db
+from flask_sandman.model import Model, AutomapModel
 from flask_sandman.admin import CustomAdminView
 from flask_admin import Admin
 from flask_httpauth import HTTPBasicAuth

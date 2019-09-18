@@ -9,7 +9,7 @@ from sqlalchemy import asc, desc
 
 # Application imports
 from flask_sandman.exception import NotFoundException, BadRequestException
-from flask_sandman.model import db
+from flask_sandman.database import DATABASE as db
 from flask_sandman.decorators import etag, validate_fields
 
 
