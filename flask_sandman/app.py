@@ -13,12 +13,11 @@ from flask_httpauth import HTTPBasicAuth
 # classes
 auth = HTTPBasicAuth()
 
-def get_app(
+def application(
         database_uri,
-        exclude_tables=None,
-        user_models=None,
-        reflect_all=True,
-        read_only=False,
+        exclude_tables=[],
+        include_models=[],
+        read_only=True,
         schema=None):
     """Return an application instance connected to the database described in
     *database_uri*.
@@ -26,7 +25,7 @@ def get_app(
     :param str database_uri: The URI connection string for the database
     :param list exclude_tables: A list of tables to exclude from the API
                                 service
-    :param list user_models: A list of user-defined models to include in the
+    :param list include_models: A list of user-defined models to include in the
                              API service
     :param bool reflect_all: Include all database tables in the API service
     :param bool read_only: Only allow HTTP GET commands for all endpoints
@@ -39,7 +38,7 @@ def get_app(
     app.classes = []
     db.init_app(app)
     admin = Admin(app, base_template='layout.html', template_mode='bootstrap3')
-    sandman(app,db,user_models or [], exclude_tables or [], admin, read_only, schema)
+    sandman(app, database=db, include_models=include_models or [], exclude_tables=exclude_tables or [], read_only=read_only, admin = admin, schema=schema)
     return app
 
 

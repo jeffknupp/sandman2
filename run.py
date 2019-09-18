@@ -1,6 +1,6 @@
-from flask_sandman import get_app
+from flask_sandman import create_app
 
-app = get_app('sqlite+pysqlite:///tests/data/db.sqlite3')
+app = create_app('sqlite+pysqlite:///tests/data/db.sqlite3')
 
 def main():
     app.run(debug=True)

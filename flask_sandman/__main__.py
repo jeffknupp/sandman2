@@ -3,7 +3,7 @@
 services automatically from existing databases."""
 
 import argparse
-from flask_sandman import get_app
+from flask_sandman import create_app
 
 
 def main():
@@ -48,7 +48,7 @@ def main():
 
 
     args = parser.parse_args()
-    app = get_app(args.URI, read_only=args.read_only, schema=args.schema)
+    app = create_app(args.URI, read_only=args.read_only, schema=args.schema)
     if args.debug:
         app.config['DEBUG'] = True
     if args.local_only:

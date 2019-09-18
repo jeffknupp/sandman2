@@ -4,11 +4,14 @@ from flask_sandman.model import Model, AutomapModel, register as register_model_
 from flask_sandman.views import register_index
 from .admin import register as register_admin_view
 
-def sandman(application, database, include_models, exclude_tables, admin, read_only, schema, root="/") :
+def sandman(application, database = db, blueprint = None, include_models = [], exclude_tables = [], read_only = True, admin = None, root = "/", schema = None):
+
     # Sandman Exceptions
     register_exceptions(application)
     # Router
-    router = application
+    router = blueprint or application
+    # app = app or current_app
+    # api = api or app
     with application.app_context():
         # Database Tables
         router.included_models, router.excluded_models = register_entities(database, include_models, exclude_tables, read_only, schema=schema)

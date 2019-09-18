@@ -9,7 +9,7 @@ sys.path.insert(0, os.path.abspath('.'))
 
 import pytest
 
-from flask_sandman import get_app, db
+from flask_sandman import create_app, db
 
 
 
@@ -33,10 +33,10 @@ def app(request):
                 if name not in ('Model', 'AutomapModel'):
                     user_models.append(obj)
 
-    application = get_app(
+    application = create_app(
         'sqlite+pysqlite:///{}'.format(
             test_database_path),
-        user_models=user_models,
+        include_models=user_models,
         exclude_tables=exclude_tables,
         read_only=read_only)
     application.testing = True
