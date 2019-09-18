@@ -278,20 +278,21 @@ def register(router, service, primary_key_type):
     resource = service.__model__.__url__.strip("/")
 
     if 'GET' in methods:  # pylint: disable=no-member
-        router.add_url_rule(f'/{resource}/',
+        router.add_url_rule('/{resource}/'.format(resource=resource),
                             defaults={'resource_id': None},
                             view_func=view_func,
                             methods=['GET'])
-        router.add_url_rule(f'/{resource}.meta',
+        router.add_url_rule('/{resource}.meta'.format(resource=resource),
                             view_func=view_func,
                             methods=['GET'])
     if 'POST' in methods:  # pylint: disable=no-member
-        router.add_url_rule(f'/{resource}/',
+        router.add_url_rule('/{resource}/'.format(resource=resource),
                             view_func=view_func,
                             methods=['POST', ])
-    router.add_url_rule(f'/{resource}' + '/<{pk_type}:{pk}>'.format(
+    router.add_url_rule('/{resource}/<{pk_type}:{pk}>'.format(
+            resource=resource,
             pk='resource_id',
             pk_type=primary_key_type),
-                        view_func=view_func,
-                        methods=methods - {'POST'})
+        view_func=view_func,
+        methods=methods - {'POST'})
     # current_app.classes.append(service)
