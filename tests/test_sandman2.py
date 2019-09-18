@@ -1,4 +1,4 @@
-"""Tests for sandman2."""
+"""Tests for flask_sandman."""
 import json
 import os
 import sys

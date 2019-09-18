@@ -1,4 +1,4 @@
-"""Tests for non-core functionality in sandman2."""
+"""Tests for non-core functionality in flask_sandman."""
 
 from pytest_flask.fixtures import client
 

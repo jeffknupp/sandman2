@@ -1,4 +1,4 @@
-"""Module containing code related to *sandman2* ORM models."""
+"""Module containing code related to *flask_sandman* ORM models."""
 
 # Standard library imports
 import datetime
@@ -14,9 +14,9 @@ db = SQLAlchemy()
 
 class Model(object):
 
-    """The sandman2 Model class is the base class for all RESTful resources.
+    """The flask_sandman Model class is the base class for all RESTful resources.
     There is a one-to-one mapping between a table in the database and a
-    :class:`sandman2.model.Model`.
+    :class:`flask_sandman.model.Model`.
     """
 
     #: The relative URL this resource should live at.

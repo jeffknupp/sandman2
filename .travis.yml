@@ -8,6 +8,6 @@ install:
   - travis_retry python setup.py develop
   - travis_retry pip install pytest-cov coverage coveralls
 script:
-  - coverage run --source=sandman2 setup.py test
+  - coverage run --source=flask_sandman setup.py test
 after_success:
   coveralls

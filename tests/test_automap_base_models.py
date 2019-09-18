@@ -1,4 +1,4 @@
-"""Test using user-defined models with sandman2."""
+"""Test using user-defined models with flask_sandman."""
 import os
 import sys
 

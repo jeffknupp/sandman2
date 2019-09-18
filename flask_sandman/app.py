@@ -5,7 +5,7 @@ from flask import Flask, current_app, jsonify
 from sqlalchemy.sql import sqltypes
 
 # Application imports
-from sandman2.exception import (
+from flask_sandman.exception import (
     BadRequestException,
     ForbiddenException,
     NotFoundException,
@@ -15,13 +15,13 @@ from sandman2.exception import (
     ServerErrorException,
     ServiceUnavailableException,
     )
-from sandman2.service import Service
-from sandman2.model import db, Model, AutomapModel
-from sandman2.admin import CustomAdminView
+from flask_sandman.service import Service
+from flask_sandman.model import db, Model, AutomapModel
+from flask_sandman.admin import CustomAdminView
 from flask_admin import Admin
 from flask_httpauth import HTTPBasicAuth
 
-# Augment sandman2's Model class with the Automap and Flask-SQLAlchemy model
+# Augment flask_sandman's Model class with the Automap and Flask-SQLAlchemy model
 # classes
 auth = HTTPBasicAuth()
 
@@ -44,7 +44,7 @@ def get_app(
     :param bool read_only: Only allow HTTP GET commands for all endpoints
     :param str schema: Use the specified named schema instead of the default
     """
-    app = Flask('sandman2')
+    app = Flask('flask_sandman')
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
     app.config['SANDMAN2_READ_ONLY'] = read_only
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -142,7 +142,7 @@ def _reflect_all(exclude_tables=None, admin=None, read_only=False, schema=None):
 def register_model(cls, admin=None):
     """Register *cls* to be included in the API service
 
-    :param cls: Class deriving from :class:`sandman2.models.Model`
+    :param cls: Class deriving from :class:`flask_sandman.models.Model`
     """
     cls.__url__ = '/{}'.format(cls.__name__.lower())
     service_class = type(

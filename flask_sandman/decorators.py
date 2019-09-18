@@ -1,9 +1,9 @@
-"""Decorators for sandman2 convenience functions."""
+"""Decorators for flask_sandman convenience functions."""
 import functools
 import hashlib
 from flask import jsonify, request, make_response
 
-from sandman2.exception import BadRequestException
+from flask_sandman.exception import BadRequestException
 
 
 def etag(func):

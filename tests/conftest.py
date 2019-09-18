@@ -9,7 +9,7 @@ sys.path.insert(0, os.path.abspath('.'))
 
 import pytest
 
-from sandman2 import get_app, db
+from flask_sandman import get_app, db
 
 
 

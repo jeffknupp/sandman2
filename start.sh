@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Start sandman2
+# Start flask_sandman
 
 if [ $DB_TYPE == "sqlite"" ] then
     sandman2ctl -p $PORT $DB_TYPE+$DB_DRIVER:///$DATABASE

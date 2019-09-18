@@ -8,9 +8,9 @@ from flask.views import MethodView
 from sqlalchemy import asc, desc
 
 # Application imports
-from sandman2.exception import NotFoundException, BadRequestException
-from sandman2.model import db
-from sandman2.decorators import etag, validate_fields
+from flask_sandman.exception import NotFoundException, BadRequestException
+from flask_sandman.model import db
+from flask_sandman.decorators import etag, validate_fields
 
 
 def add_link_headers(response, links):
@@ -59,7 +59,7 @@ class Service(MethodView):
     is available through the admin interface.
     """
 
-    #: The sandman2.model.Model-derived class to expose
+    #: The flask_sandman.model.Model-derived class to expose
     __model__ = None
 
     #: The string used to describe the elements when a collection is
@@ -189,7 +189,7 @@ class Service(MethodView):
         return flask.jsonify(self.__model__.description())
 
     def _resource(self, resource_id):
-        """Return the ``sandman2.model.Model`` instance with the given
+        """Return the ``flask_sandman.model.Model`` instance with the given
         *resource_id*.
 
         :rtype: :class:`sandman2.model.Model`

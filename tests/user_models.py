@@ -1,6 +1,6 @@
 import datetime
 
-from sandman2.model import db, Model
+from flask_sandman.model import db, Model
 
 from tests.resources import (
     GET_ERROR_MESSAGE,

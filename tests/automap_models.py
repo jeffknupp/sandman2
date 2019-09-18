@@ -1,4 +1,4 @@
-from sandman2 import AutomapModel
+from flask_sandman import AutomapModel
 
 
 class User(AutomapModel):

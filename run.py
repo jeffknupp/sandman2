@@ -1,4 +1,4 @@
-from sandman2 import get_app
+from flask_sandman import get_app
 
 app = get_app('sqlite+pysqlite:///tests/data/db.sqlite3')
 

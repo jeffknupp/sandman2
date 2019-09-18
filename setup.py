@@ -1,4 +1,4 @@
-"""Setup script for sandman2."""
+"""Setup script for flask_sandman."""
 from __future__ import print_function
 from setuptools import setup
 from setuptools.command.test import test as TestCommand
@@ -35,7 +35,7 @@ class PyTest(TestCommand):
         sys.exit(errno)
 
 setup(
-    name='sandman2',
+    name='flask_sandman',
     version='1.2.2',
     url='http://github.com/jeffknupp/sandman2/',
     license='Apache Software License',
@@ -54,15 +54,15 @@ setup(
     long_description=LONG_DESCRIPTION,
     entry_points={
         'console_scripts': [
-            'sandman2ctl = sandman2.__main__:main',
+            'sandman2ctl = flask_sandman.__main__:main',
             ],
         },
-    packages=['sandman2'],
+    packages=['flask_sandman'],
     include_package_data=True,
     platforms='any',
     test_suite='tests.test_sandman2',
     zip_safe=False,
-    package_data={'sandman2': ['templates/**.html']},
+    package_data={'flask_sandman': ['templates/**.html']},
     classifiers=[
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',

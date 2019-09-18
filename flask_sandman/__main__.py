@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-"""sandman2ctl is a wrapper around the sandman2 library, which creates REST API
+"""sandman2ctl is a wrapper around the flask_sandman library, which creates REST API
 services automatically from existing databases."""
 
 import argparse
-from sandman2 import get_app
+from flask_sandman import get_app
 
 
 def main():
