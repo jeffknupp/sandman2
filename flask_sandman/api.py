@@ -1,28 +1,47 @@
 from flask_sandman.database import DATABASE as db
 from flask_sandman.exception import register as register_exceptions
-from flask_sandman.model import Model, AutomapModel, register as register_model
+from flask_sandman.model import Model, AutomapModel, register as register_model_view
+from flask_sandman.views import register_index
+from .admin import register as register_admin_view
 
-
-def sandman(application, user_models, exclude_tables, admin, read_only, schema, reflect_all) :
+def sandman(application, database, include_models, exclude_tables, admin, read_only, schema, root="/") :
     # Sandman Exceptions
     register_exceptions(application)
     # Router
     router = application
     with application.app_context():
-        if user_models:
-            if any([issubclass(cls, AutomapModel) for cls in user_models]):
-                AutomapModel.prepare(  # pylint:disable=maybe-no-member
-                    db.engine, reflect=True, schema=schema)
+        # Database Tables
+        router.included_models, router.excluded_models = register_entities(database, include_models, exclude_tables, read_only, schema=schema)
+        # router.models = router.included_models + router.excluded_models # Mostly used for development
+        router.model_views = []
+        router.admin_views = []
+        for model in router.included_models:
+            # Model Views
+            router.model_views.append(register_model_view(router, model))
+            # Admin Views
+            if admin:
+                router.admin_views.append(register_admin_view(admin, model))
+        # API Index
+        if root: register_index(router, root)
+    return router
 
-            for user_model in user_models:
-                register_model(user_model, admin)
-        elif reflect_all:
-            AutomapModel.prepare(  # pylint:disable=maybe-no-member
-                db.engine, reflect=True, schema=schema)
-            for cls in AutomapModel.classes:
-                if exclude_tables and cls.__table__.name in exclude_tables:
-                    continue
-                if read_only:
-                    cls.__methods__ = {'GET'}
-                register_model(cls, admin)    # with application.app_context():
 
+def register_entities(database, include_models = [], exclude_tables = [], read_only = True, schema=None, automodel = AutomapModel):
+    models = []
+    tablename = lambda model : getattr(getattr(model, "__table__"), "name", "") if hasattr(model, "__table__") else getattr(model, "__tablename__", "")
+    automodel.prepare(database.engine, reflect=True, schema=schema)
+    # if include_models :
+    for model in include_models:
+        models.append(model)
+    tables = [tablename(model) for model in models]
+    # else :
+    for model in automodel.classes:
+        if tablename(model) in tables: # Prevents including an automatically mapped model that has been overwritten by a custom model listed in included_models
+            continue
+        if read_only:
+            model.__methods__ = {'GET'} # TODO : Can this safely include HEAD and OPTIONS requests ?
+        models.append(model)
+    # return models
+    include, exclude = [], []
+    [exclude.append(model) if tablename(model) in exclude_tables else include.append(model) for model in models]
+    return include, exclude

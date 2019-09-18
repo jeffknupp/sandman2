@@ -266,32 +266,32 @@ class Service(MethodView):
         return response
 
 
-def register(cls, primary_key_type):
+def register(router, service, primary_key_type):
     """Register an API service endpoint.
 
-    :param cls: The class to register
+    :param service: The class to register
     :param str primary_key_type: The type (as a string) of the primary_key
                                  field
     """
-    view_func = cls.as_view(cls.__name__.lower())  # pylint: disable=no-member
-    methods = set(cls.__model__.__methods__)  # pylint: disable=no-member
+    view_func = service.as_view(service.__model__.__name__.lower()) # Originally : service.__name__.lower()) Currently : service.__model__.__url__
+    methods = set(service.__model__.__methods__)  # pylint: disable=no-member
+    resource = service.__model__.__url__.strip("/")
 
     if 'GET' in methods:  # pylint: disable=no-member
-        current_app.add_url_rule(
-            cls.__model__.__url__ + '/', defaults={'resource_id': None},
-            view_func=view_func,
-            methods=['GET'])
-        current_app.add_url_rule(
-            '{resource}/meta'.format(resource=cls.__model__.__url__),
-            view_func=view_func,
-            methods=['GET'])
+        router.add_url_rule(f'/{resource}/',
+                            defaults={'resource_id': None},
+                            view_func=view_func,
+                            methods=['GET'])
+        router.add_url_rule(f'/{resource}.meta',
+                            view_func=view_func,
+                            methods=['GET'])
     if 'POST' in methods:  # pylint: disable=no-member
-        current_app.add_url_rule(
-            cls.__model__.__url__ + '/', view_func=view_func, methods=['POST', ])
-    current_app.add_url_rule(
-        '{resource}/<{pk_type}:{pk}>'.format(
-            resource=cls.__model__.__url__,
-            pk='resource_id', pk_type=primary_key_type),
-        view_func=view_func,
-        methods=methods - {'POST'})
-    current_app.classes.append(cls)
+        router.add_url_rule(f'/{resource}/',
+                            view_func=view_func,
+                            methods=['POST', ])
+    router.add_url_rule(f'/{resource}' + '/<{pk_type}:{pk}>'.format(
+            pk='resource_id',
+            pk_type=primary_key_type),
+                        view_func=view_func,
+                        methods=methods - {'POST'})
+    # current_app.classes.append(service)

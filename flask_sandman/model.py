@@ -12,7 +12,6 @@ from sqlalchemy.sql import sqltypes
 
 # Application imports
 from .database import DATABASE as db
-from .admin import register as register_admin_view
 from .service import Service, register as register_service
 
 
@@ -145,13 +144,13 @@ class Model(object):
 DeclarativeModel = declarative_base(cls=(db.Model, Model), name="AutomapModel")
 AutomapModel = automap_base(DeclarativeModel)
 
-def register(model, admin=None):
+def register(router, model):
     """Register *cls* to be included in the API service
 
     :param model: Class deriving from :class:`flask_sandman.models.Model`
     """
     model.__url__ = '/{}'.format(model.__name__.lower())
-    service_class = type(
+    service = type(
         model.__name__ + 'Service',
         (Service,),
         {
@@ -180,11 +179,9 @@ def register(model, admin=None):
         # composite keys not supported (yet)
         primary_key_type = 'string'
 
-    # registration
-    register_service(service_class, primary_key_type)
 
-    # Admin Views
-    if admin:
-        register_admin_view(admin, model)
+    # registration
+    register_service(router, service, primary_key_type)
+    return service
 
 __all__ = ["BaseModel", "AutomapModel"]

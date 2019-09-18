@@ -4,7 +4,6 @@
 from flask import Flask, current_app, jsonify
 
 # Application imports
-from flask_sandman.views import register_index
 from flask_sandman.database import DATABASE as db
 from flask_sandman.api import sandman
 from flask_admin import Admin
@@ -40,8 +39,7 @@ def get_app(
     app.classes = []
     db.init_app(app)
     admin = Admin(app, base_template='layout.html', template_mode='bootstrap3')
-    sandman(app,user_models, exclude_tables, admin, read_only, schema, reflect_all)
-    register_index(app)
+    sandman(app,db,user_models or [], exclude_tables or [], admin, read_only, schema)
     return app
 
 
