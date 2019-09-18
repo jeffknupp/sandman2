@@ -9,7 +9,7 @@ from flask_sandman.exception import register as register_exceptions
 from flask_sandman.service import Service
 from flask_sandman.database import DATABASE as db
 from flask_sandman.model import Model, AutomapModel
-from flask_sandman.admin import CustomAdminView
+from flask_sandman.admin import register as register_admin_view
 from flask_admin import Admin
 from flask_httpauth import HTTPBasicAuth
 
@@ -110,21 +110,21 @@ def _reflect_all(exclude_tables=None, admin=None, read_only=False, schema=None):
         register_model(cls, admin)
 
 
-def register_model(cls, admin=None):
+def register_model(model, admin=None):
     """Register *cls* to be included in the API service
 
-    :param cls: Class deriving from :class:`flask_sandman.models.Model`
+    :param model: Class deriving from :class:`flask_sandman.models.Model`
     """
-    cls.__url__ = '/{}'.format(cls.__name__.lower())
+    model.__url__ = '/{}'.format(model.__name__.lower())
     service_class = type(
-        cls.__name__ + 'Service',
+        model.__name__ + 'Service',
         (Service,),
         {
-            '__model__': cls,
+            '__model__': model,
         })
 
     # inspect primary key
-    cols = list(cls().__table__.primary_key.columns)
+    cols = list(model().__table__.primary_key.columns)
 
     # composite keys not supported (yet)
     primary_key_type = 'string'
@@ -140,8 +140,10 @@ def register_model(cls, admin=None):
 
     # registration
     register_service(service_class, primary_key_type)
-    if admin is not None:
-        admin.add_view(CustomAdminView(cls, db.session))
+
+    # Admin Views
+    if admin:
+        register_admin_view(admin, model)
 
 
 def _register_user_models(user_models, admin=None, schema=None):
