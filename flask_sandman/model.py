@@ -7,8 +7,13 @@ from decimal import Decimal
 from sqlalchemy.inspection import inspect
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.ext.declarative import declarative_base
+# SQLAlchemy
+from sqlalchemy.sql import sqltypes
+
 # Application imports
 from .database import DATABASE as db
+from .admin import register as register_admin_view
+from .service import Service, register as register_service
 
 
 class Model(object):
@@ -140,5 +145,46 @@ class Model(object):
 DeclarativeModel = declarative_base(cls=(db.Model, Model), name="AutomapModel")
 AutomapModel = automap_base(DeclarativeModel)
 
+def register(model, admin=None):
+    """Register *cls* to be included in the API service
+
+    :param model: Class deriving from :class:`flask_sandman.models.Model`
+    """
+    model.__url__ = '/{}'.format(model.__name__.lower())
+    service_class = type(
+        model.__name__ + 'Service',
+        (Service,),
+        {
+            '__model__': model,
+        })
+
+    # inspect primary key
+    # composite keys not supported (yet)
+    # types defined at http://flask.pocoo.org/docs/0.10/api/#url-route-registrations
+    cols = list(model.__table__.primary_key.columns)
+    if len(cols) == 1:
+        # types defined at http://flask.pocoo.org/docs/0.10/api/#url-route-registrations
+        primary_key_type = {
+            sqltypes.String : 'string',
+            sqltypes.Integer: 'int',
+            sqltypes.Numeric: 'float'}.get(cols[0].type, 'string')
+        # Originally :
+        # col_type = cols[0].type
+        # if isinstance(col_type, sqltypes.String):
+        #     primary_key_type = 'string'
+        # elif isinstance(col_type, sqltypes.Integer):
+        #     primary_key_type = 'int'
+        # elif isinstance(col_type, sqltypes.Numeric):
+        #     primary_key_type = 'float'
+    else:
+        # composite keys not supported (yet)
+        primary_key_type = 'string'
+
+    # registration
+    register_service(service_class, primary_key_type)
+
+    # Admin Views
+    if admin:
+        register_admin_view(admin, model)
 
 __all__ = ["BaseModel", "AutomapModel"]

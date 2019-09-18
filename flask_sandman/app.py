@@ -8,7 +8,7 @@ from sqlalchemy.sql import sqltypes
 from flask_sandman.exception import register as register_exceptions
 from flask_sandman.service import Service, register as register_service
 from flask_sandman.database import DATABASE as db
-from flask_sandman.model import Model, AutomapModel
+from flask_sandman.model import Model, AutomapModel, register as register_model
 from flask_sandman.admin import register as register_admin_view
 from flask_admin import Admin
 from flask_httpauth import HTTPBasicAuth
@@ -63,6 +63,20 @@ def get_app(
     return app
 
 
+def _register_user_models(user_models, admin=None, schema=None):
+    """Register any user-defined models with the API Service.
+
+    :param list user_models: A list of user-defined models to include in the
+                             API service
+    """
+    if any([issubclass(cls, AutomapModel) for cls in user_models]):
+        AutomapModel.prepare(  # pylint:disable=maybe-no-member
+                               db.engine, reflect=True, schema=schema)
+
+    for user_model in user_models:
+        register_model(user_model, admin)
+
+
 def _reflect_all(exclude_tables=None, admin=None, read_only=False, schema=None):
     """Register all tables in the given database as services.
 
@@ -79,51 +93,3 @@ def _reflect_all(exclude_tables=None, admin=None, read_only=False, schema=None):
         register_model(cls, admin)
 
 
-def register_model(model, admin=None):
-    """Register *cls* to be included in the API service
-
-    :param model: Class deriving from :class:`flask_sandman.models.Model`
-    """
-    model.__url__ = '/{}'.format(model.__name__.lower())
-    service_class = type(
-        model.__name__ + 'Service',
-        (Service,),
-        {
-            '__model__': model,
-        })
-
-    # inspect primary key
-    cols = list(model().__table__.primary_key.columns)
-
-    # composite keys not supported (yet)
-    primary_key_type = 'string'
-    if len(cols) == 1:
-        col_type = cols[0].type
-        # types defined at http://flask.pocoo.org/docs/0.10/api/#url-route-registrations
-        if isinstance(col_type, sqltypes.String):
-            primary_key_type = 'string'
-        elif isinstance(col_type, sqltypes.Integer):
-            primary_key_type = 'int'
-        elif isinstance(col_type, sqltypes.Numeric):
-            primary_key_type = 'float'
-
-    # registration
-    register_service(service_class, primary_key_type)
-
-    # Admin Views
-    if admin:
-        register_admin_view(admin, model)
-
-
-def _register_user_models(user_models, admin=None, schema=None):
-    """Register any user-defined models with the API Service.
-
-    :param list user_models: A list of user-defined models to include in the
-                             API service
-    """
-    if any([issubclass(cls, AutomapModel) for cls in user_models]):
-        AutomapModel.prepare(  # pylint:disable=maybe-no-member
-                               db.engine, reflect=True, schema=schema)
-
-    for user_model in user_models:
-        register_model(user_model, admin)
