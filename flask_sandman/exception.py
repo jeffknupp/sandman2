@@ -1,4 +1,5 @@
 """JSON-based Exception classes which generate proper HTTP Status Codes."""
+from flask import jsonify
 
 
 class EndpointException(Exception):
@@ -79,3 +80,35 @@ class ServiceUnavailableException(EndpointException):
     error."""
 
     code = 503
+
+
+def register(app):
+    """Register error-handlers for the application.
+
+    :param app: The application instance
+    """
+    @app.errorhandler(BadRequestException)
+    @app.errorhandler(ForbiddenException)
+    @app.errorhandler(NotAcceptableException)
+    @app.errorhandler(NotFoundException)
+    @app.errorhandler(ConflictException)
+    @app.errorhandler(ServerErrorException)
+    @app.errorhandler(NotImplementedException)
+    @app.errorhandler(ServiceUnavailableException)
+    def handle_application_error(error):  # pylint:disable=unused-variable
+        """Handler used to send JSON error messages rather than default HTML
+        ones."""
+        response = jsonify(error.to_dict())
+        response.status_code = error.code
+        return response
+
+__all__ = [
+    "BadRequestException",
+    "ConflictException",
+    "ForbiddenException",
+    "NotFoundException",
+    "NotAcceptableException",
+    "NotImplementedException",
+    "ServerErrorException",
+    "ServiceUnavailableException"]
+

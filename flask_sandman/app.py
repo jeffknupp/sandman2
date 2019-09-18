@@ -5,16 +5,7 @@ from flask import Flask, current_app, jsonify
 from sqlalchemy.sql import sqltypes
 
 # Application imports
-from flask_sandman.exception import (
-    BadRequestException,
-    ForbiddenException,
-    NotFoundException,
-    NotAcceptableException,
-    NotImplementedException,
-    ConflictException,
-    ServerErrorException,
-    ServiceUnavailableException,
-    )
+from flask_sandman.exception import register as register_exceptions
 from flask_sandman.service import Service
 from flask_sandman.model import db, Model, AutomapModel
 from flask_sandman.admin import CustomAdminView
@@ -51,7 +42,7 @@ def get_app(
     app.classes = []
     db.init_app(app)
     admin = Admin(app, base_template='layout.html', template_mode='bootstrap3')
-    _register_error_handlers(app)
+    register_exceptions(app)
     if user_models:
         with app.app_context():
             _register_user_models(user_models, admin, schema=schema)
@@ -69,27 +60,6 @@ def get_app(
                 cls.__model__.primary_key())
         return jsonify(routes)
     return app
-
-
-def _register_error_handlers(app):
-    """Register error-handlers for the application.
-
-    :param app: The application instance
-    """
-    @app.errorhandler(BadRequestException)
-    @app.errorhandler(ForbiddenException)
-    @app.errorhandler(NotAcceptableException)
-    @app.errorhandler(NotFoundException)
-    @app.errorhandler(ConflictException)
-    @app.errorhandler(ServerErrorException)
-    @app.errorhandler(NotImplementedException)
-    @app.errorhandler(ServiceUnavailableException)
-    def handle_application_error(error):  # pylint:disable=unused-variable
-        """Handler used to send JSON error messages rather than default HTML
-        ones."""
-        response = jsonify(error.to_dict())
-        response.status_code = error.code
-        return response
 
 
 def register_service(cls, primary_key_type):
