@@ -1,5 +1,14 @@
-"""Module containing code related to *flask_sandman* ORM models."""
+"""Module containing code related to *flask_sandman* ORM models.
 
+The primary out come of this module is to provide a base :class:``Model`` for Sandman and any third party packages that extend it.
+The module provides a declarative base model, :class:`DeclarativeBase`, for use in the database object and a
+
+`Deferred Base`_ illustrates how to make a :class:`Model` class that supports reflection.
+`Declarative Base`_ covers the provisioning of a :class:`Model` class on the ORM that maps to a table in ones database; SQLalchemy by design is simply a database connector the ORM layer is provisional.
+
+..[Deferred Base]:: https://docs.sqlalchemy.org/en/13/orm/extensions/declarative/table_config.html#using-reflection-with-declarative
+..[Declarative Base]:: https://flask.palletsprojects.com/en/1.1.x/patterns/sqlalchemy/#declarative
+"""
 # Standard library imports
 import datetime
 from decimal import Decimal
@@ -14,13 +23,39 @@ from sqlalchemy.sql import sqltypes
 from .database import DATABASE as db
 from .service import Service, register as register_service
 
+# Meta Class
+#
+# The code below can readily be extended with the following construct to accommodate a meta class [1].
+#
+# [1] https://flask-sqlalchemy.palletsprojects.com/en/2.x/customizing/#model-metaclass
+#
+# from sqlalchemy.model import DefaultMeta, Model
+#
+# class MetaModel(DefaultMeta) :
+#     """"""
+# class BaseModel(metaclass = MetaModel):
+#     """"""
+# DeclarativeModel = declarative_base(cls=BaseModel, metaclass=MetaModel, name='Model')
+# Model = automap_base(DeclarativeModel)
+# DATABASE = SQLAlchemy(model_class=DeclarativeModel)
 
+#class BaseModel(object): # class BaseModel(Model, DeferredReflection):
 class Model(object):
-
     """The flask_sandman Model class is the base class for all RESTful resources.
     There is a one-to-one mapping between a table in the database and a
     :class:`flask_sandman.model.Model`.
+
+    :class:`Model` is used as the declarative/automap'd `base class <baseclass>` for SQLAlchemy; strictly Flask-SQLALchemy.
+    It is used within Sandman2 to represent the tables within ones schema and may readily be extended by users.
+
+    .. class:: `Flask-SQLAlchemy : Base Class<https://flask-sqlalchemy.palletsprojects.com/en/2.x/models/>`_
     """
+    # [1] Illustrates how one might extend the declarative base class, it might prove useful should one want to integrate Marshmallow into the base class
+    # [2] shows how one might register a blue print directly from the ModelView class
+    #
+    # [1] https://docs.sqlalchemy.org/en/13/orm/extensions/declarative/mixins.html#mixin-and-custom-base-classes
+    # [2] https://stackoverflow.com/a/39441841
+    # TODO : The doc string originally referenced a `..baseclass::` directive, I'm not entirely sure which Sphinx module provides such a directive so have replaced this with a reference to a `:class:` role
 
     #: The relative URL this resource should live at.
     __url__ = None
@@ -76,20 +111,6 @@ class Model(object):
             cls.__table__.primary_key.columns)[  # pylint: disable=no-member
                 0].key
 
-    def to_dict(self):
-        """Return the resource as a dictionary.
-
-        :rtype: dict
-        """
-        result_dict = {}
-        for column in self.__table__.columns.keys():  # pylint: disable=no-member
-            value = result_dict[column] = getattr(self, column, None)
-            if isinstance(value, Decimal):
-                result_dict[column] = float(result_dict[column])
-            elif isinstance(value, datetime.datetime):
-                result_dict[column] = value.isoformat()
-        return result_dict
-
     def links(self):
         """Return a dictionary of links to related resources that should be
         included in the *Link* header of an HTTP response.
@@ -114,16 +135,36 @@ class Model(object):
         """
         return self.__url__ + '/' + str(getattr(self, self.primary_key()))
 
-    def update(self, attributes):
+    def to_dict(self):
+        """Return the resource as a dictionary.
+
+        :rtype: dict
+        """
+        result_dict = {}
+        for column in self.__table__.columns.keys():  # pylint: disable=no-member
+            value = result_dict[column] = getattr(self, column, None)
+            if isinstance(value, Decimal):
+                result_dict[column] = float(result_dict[column])
+            elif isinstance(value, datetime.datetime):
+                result_dict[column] = value.isoformat()
+        return result_dict
+
+    def from_dict(self, data):
         """Update the current instance based on attribute->value items in
         *attributes*.
 
-        :param dict attributes: Dictionary of attributes to be updated
+        :param dict data: Dictionary of attributes to be updated
         :rtype: :class:`sandman2.model.Model`
         """
-        for attribute in attributes:
-            setattr(self, attribute, attributes[attribute])
+        for key in data:
+            setattr(self, key, data[key])
         return self
+
+    def retrieve(self): # Rename to pull; get might be better still
+        return self.to_dict()
+
+    def update(self, data): # Rename to push; put/post might be better still
+        return self.from_dict(data)
 
     @classmethod
     def description(cls):
@@ -141,8 +182,14 @@ class Model(object):
             description[column.name] = column_description
         return description
 
+# Currently
 DeclarativeModel = declarative_base(cls=(db.Model, Model), name="AutomapModel")
 AutomapModel = automap_base(DeclarativeModel)
+# DeclarativeModel = declarative_base(cls=(DATABASE.Model, BaseModel), name="AutomapModel") #, name='Model')
+# AutomapModel = automap_base(DeclarativeModel) # Changing the name here seems to make both the class and the package fragile for some reason
+# Originally :
+# DeclarativeModel = declarative_base(cls=BaseModel, name='Model')
+# Model = automap_base(DeclarativeModel) # Originally : AutomapModel
 
 def register(router, model):
     """Register *cls* to be included in the API service

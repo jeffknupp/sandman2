@@ -4,10 +4,11 @@
 from flask import Flask, current_app, jsonify
 
 # Application imports
-from flask_sandman.database import DATABASE as db
-from flask_sandman.api import sandman
 from flask_admin import Admin
 from flask_httpauth import HTTPBasicAuth
+# Application imports
+from flask_sandman.database import DATABASE as db
+from flask_sandman.api import sandman
 
 # Augment flask_sandman's Model class with the Automap and Flask-SQLAlchemy model
 # classes
@@ -27,10 +28,12 @@ def application(
                                 service
     :param list include_models: A list of user-defined models to include in the
                              API service
-    :param bool reflect_all: Include all database tables in the API service
     :param bool read_only: Only allow HTTP GET commands for all endpoints
     :param str schema: Use the specified named schema instead of the default
     """
+    # :param AdminView admin_view: Flask admin view subclass
+    # :param Admin admin: Flask admin interface
+    # :param str schema: Use the specified named schema instead of the default, SQLALCHEMY_DB_SCHEMA (or SQLALCHEMY_DATABASE_SCHEMA?)
     app = Flask('flask_sandman')
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
     app.config['SANDMAN2_READ_ONLY'] = read_only
@@ -40,7 +43,4 @@ def application(
     admin = Admin(app, base_template='layout.html', template_mode='bootstrap3')
     sandman(app, database=db, include_models=include_models or [], exclude_tables=exclude_tables or [], read_only=read_only, admin = admin, schema=schema)
     return app
-
-
-
 

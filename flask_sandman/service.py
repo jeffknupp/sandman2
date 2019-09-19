@@ -1,6 +1,10 @@
 """Automatically generated REST API services from SQLAlchemy
-ORM models or a database introspection."""
+ORM models or a database introspection.
 
+.. note ::
+
+    I haven't worked out how to determine the application type on the fly and am currently storing this within the application configuration
+"""
 # Third-party imports
 import flask
 from flask import current_app, request, make_response
@@ -42,8 +46,9 @@ def jsonify(resource):
 
 
 def is_valid_method(model, resource=None):
-    """Return the error message to be sent to the client if the current
-    request passes fails any user-defined validation."""
+    """:class:`Service` classes may define an :meth:`is_valid_get|post|put|delete` method.
+
+    Such methods receive the current request and possibly a record as their arguments returning a relevant error message to be sent to the client"""
     validation_function_name = 'is_valid_{}'.format(
         request.method.lower())
     if hasattr(model, validation_function_name):
@@ -64,7 +69,7 @@ class Service(MethodView):
 
     #: The string used to describe the elements when a collection is
     #: returned.
-    __json_collection_name__ = 'resources'
+    __json_collection_name__ = 'resources' # None #  TODO : Make this None by default
 
     def delete(self, resource_id):
         """Return an HTTP response object resulting from a HTTP DELETE call.
@@ -88,26 +93,26 @@ class Service(MethodView):
 
         :param resource_id: The value of the resource's primary key
         """
-        if request.path.endswith('meta'):
+        if request.path.endswith('meta'): # Change to '.meta'
             return self._meta()
+        #if request.path.endswith('.csv'):
+        #    return self.csv(self._all_resources())
 
         if resource_id is None:
             error_message = is_valid_method(self.__model__)
             if error_message:
                 raise BadRequestException(error_message)
-
+            # Handled by the CSV endpoint
             if 'export' in request.args: 
-                return self._export(self._all_resources())
-
-            return flask.jsonify({
-                self.__json_collection_name__: self._all_resources()
-                })
+                return self.csv(self._all_resources())
+            # return self.records2JSON({self.__json_collection_name__: self._all_resources()} if self.__json_collection_name__ else self._all_resources())
+            return flask.jsonify({self.__json_collection_name__: self._all_resources()})
         else:
             resource = self._resource(resource_id)
             error_message = is_valid_method(self.__model__, resource)
             if error_message:
                 raise BadRequestException(error_message)
-            return jsonify(resource)
+            return self.record2JSON(resource)
 
     def patch(self, resource_id):
         """Return an HTTP response object resulting from an HTTP PATCH call.
@@ -126,7 +131,7 @@ class Service(MethodView):
         resource.update(request.json)
         db.session().merge(resource)
         db.session().commit()
-        return jsonify(resource)
+        return self.record2JSON(resource)
 
     @validate_fields
     def post(self):
@@ -173,7 +178,7 @@ class Service(MethodView):
             resource.update(request.json)
             db.session().merge(resource)
             db.session().commit()
-            return jsonify(resource)
+            return self.record2JSON(resource)
 
         resource = self.__model__(**request.json)  # pylint: disable=not-callable
         error_message = is_valid_method(self.__model__, resource)
@@ -183,12 +188,12 @@ class Service(MethodView):
         db.session().commit()
         return self._created_response(resource)
 
-    def _meta(self):
+    def _meta(self): # TODO : Rename to __meta__ or meta
         """Return a description of this resource as reported by the
         database."""
         return flask.jsonify(self.__model__.description())
 
-    def _resource(self, resource_id):
+    def _resource(self, resource_id): # TODO : Rename to _record_ or recordByID
         """Return the ``flask_sandman.model.Model`` instance with the given
         *resource_id*.
 
@@ -199,7 +204,7 @@ class Service(MethodView):
             raise NotFoundException()
         return resource
 
-    def _all_resources(self):
+    def _all_resources(self): # TODO : Rename to _records_ or _collection_
         """Return the complete collection of resources as a list of
         dictionaries.
 
@@ -229,9 +234,9 @@ class Service(MethodView):
         else:
             queryset = queryset.limit(limit)
             resources = queryset.all()
-        return [r.to_dict() for r in resources]
+        return [r.retrieve() for r in resources]
 
-    def _export(self, collection):
+    def csv(self, collection):
         """Return a CSV of the resources in *collection*.
 
         :param list collection: A list of resources represented by dicts
@@ -244,6 +249,37 @@ class Service(MethodView):
         response.mimetype = 'text/csv'
         return response
 
+    @staticmethod
+    def records2JSON(resources):
+        """Return a collection of records
+
+        .. todo::
+
+            This should really accept a SQL query object rather then a list of dicts.
+            It should also be integrated with `self.record2JSON`.
+
+        :param resources: A list of dictioneries as determined by self._all_resources.
+        :return: Either a `dict` or a `Response`
+        """
+        # if current_app.config.get("APP_TYPE", None) == FlaskAPI: # TODO : [1]
+        #     return resources
+        # else :
+        return flask.jsonify(resources)
+
+    @staticmethod
+    def record2JSON(resource):
+        """Return a Flask ``Response`` object containing a
+        JSON representation of *resource*.
+
+        :param resource: The resource to act as the basis of the response
+        """
+        # if current_app.config.get("APP_TYPE", None) == FlaskAPI: # TODO : [1]
+        #     return resource.retrieve()
+        # else :
+        response = flask.jsonify(resource.retrieve())
+        print(resource.links())
+        response = add_link_headers(response, resource.links())
+        return response
 
     @staticmethod
     def _no_content_response():
@@ -261,10 +297,13 @@ class Service(MethodView):
 
         :returns: HTTP Response
         """
-        response = jsonify(resource)
+        response = Service.record2JSON(resource)
         response.status_code = 201
         return response
 
+    # TODO : Override as_view to use the current models name/URL ?
+
+# TODO : [1] Properly determine the application type; Presently users must store the application type in the application configuration e.g. app.config["app_type"] = type(app); Testing the attribute wsgi_app of current_app seems promising but this is a function not a reference to the application
 
 def register(router, service, primary_key_type):
     """Register an API service endpoint.

@@ -9,12 +9,16 @@ class EndpointException(Exception):
         super(EndpointException, self).__init__(message)
         self.message = message
         self.payload = payload
+        # self.payload = payload
 
     def to_dict(self):
         """Return a dictionary representation of the exception."""
         as_dict = dict(self.payload or ())
         as_dict['message'] = self.message
         return as_dict
+        # error = {# "payload" : self.payload or (),
+        #          "message" : self.message}
+        # return error
 
 
 class BadRequestException(EndpointException):
@@ -23,6 +27,15 @@ class BadRequestException(EndpointException):
     doesn't make sense."""
 
     code = 400
+
+
+class ConflictException(EndpointException):
+    """Similar to a ServerErrorException (HTTP 500) but there is some action the
+    client may take to resolve the conflict, after which the request can be
+    resubmitted. A request to reprocess a job not marked for reprocessing, for
+    example, could cause this exception to be raised."""
+
+    code = 409
 
 
 class ForbiddenException(EndpointException):
@@ -49,13 +62,12 @@ class NotAcceptableException(EndpointException):
     code = 406
 
 
-class ConflictException(EndpointException):
-    """Similar to a ServerErrorException (HTTP 500) but there is some action the
-    client may take to resolve the conflict, after which the request can be
-    resubmitted. A request to reprocess a job not marked for reprocessing, for
-    example, could cause this exception to be raised."""
+class NotImplementedException(EndpointException):
+    """Raised when the application does not implement the functionality being
+    requested. Note that this doesn't refer to an HTTP method not being
+    implemented for a given endpoint (which would be a 405 error)."""
 
-    code = 409
+    code = 501
 
 
 class ServerErrorException(EndpointException):
@@ -63,14 +75,6 @@ class ServerErrorException(EndpointException):
     request itself (for example, a database error)."""
 
     code = 500
-
-
-class NotImplementedException(EndpointException):
-    """Raised when the application does not implement the functionality being
-    requested. Note that this doesn't refer to an HTTP method not being
-    implemented for a given endpoint (which would be a 405 error)."""
-
-    code = 501
 
 
 class ServiceUnavailableException(EndpointException):
@@ -98,6 +102,16 @@ def register(app):
     def handle_application_error(error):  # pylint:disable=unused-variable
         """Handler used to send JSON error messages rather than default HTML
         ones."""
+        # Currently
+        # if app.config.get("APP_TYPE") == FlaskAPI :
+        #     response = error.to_dict()
+        #     # response["error_code"] = error.code
+        #     return response, error.code
+        # else :
+        #     response = jsonify(error.to_dict())
+        #     response.error_code = error.code
+        #     return response, error.code
+        # Originally
         response = jsonify(error.to_dict())
         response.status_code = error.code
         return response
