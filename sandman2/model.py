@@ -85,6 +85,8 @@ class Model(object):
                 result_dict[column] = float(result_dict[column])
             elif isinstance(value, datetime.datetime):
                 result_dict[column] = value.isoformat()
+            elif isinstance(value, datetime.time):
+                result_dict[column] = value.strftime("%H:%M:%S")
         return result_dict
 
     def links(self):
