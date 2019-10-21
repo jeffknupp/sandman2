@@ -10,6 +10,6 @@ pytest-cov==2.8.1
 pytest-flask==0.15.0
 six==1.12.0
 wcwidth==0.1.7
-Werkzeug==0.15.4
+Werkzeug==0.16.0
 WTForms==2.2.1
 zipp==0.5.1
