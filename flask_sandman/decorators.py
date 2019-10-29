@@ -15,9 +15,7 @@ def etag(func):
     def wrapped(*args, **kwargs):
         """Call the view function and generate an ETag value, checking the
         headers to determine what response to send."""
-        # only for HEAD and GET requests
-        assert request.method in ['HEAD', 'GET'],\
-            '@etag is only supported for GET requests'
+        assert request.method in ['HEAD', 'GET'], '@etag is only supported for GET requests'
         response = func(*args, **kwargs)
         response = make_response(response)
         etag_value = '"' + hashlib.md5(response.get_data()).hexdigest() + '"'
