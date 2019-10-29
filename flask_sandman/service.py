@@ -76,7 +76,7 @@ class Service(MethodView):
             raise BadRequestException(error_message)
         db.session().delete(resource)
         db.session().commit()
-        return self._no_content_response()
+        return self.response_without_content()
 
     @etag
     def get(self, resource_id=None):
@@ -96,7 +96,7 @@ class Service(MethodView):
                 raise BadRequestException(error_message)
 
             if 'export' in request.args: 
-                return self._export(self.records())
+                return self.records2json(self.records())
             return flask.jsonify({self.__json_collection_name__: self.records()})
         else:
             resource = self.record(resource_id)
@@ -138,7 +138,7 @@ class Service(MethodView):
             error_message = is_valid_method(self.__model__, resource)
             if error_message:
                 raise BadRequestException(error_message)
-            return self._no_content_response()
+            return self.response_without_content()
 
         resource = self.__model__(**request.json)  # pylint: disable=not-callable
         error_message = is_valid_method(self.__model__, resource)
@@ -146,7 +146,7 @@ class Service(MethodView):
             raise BadRequestException(error_message)
         db.session().add(resource)
         db.session().commit()
-        return self._created_response(resource)
+        return self.response_with_content(resource)
 
     def put(self, resource_id):
         """Return the JSON representation of a new resource created or updated
@@ -177,7 +177,7 @@ class Service(MethodView):
             raise BadRequestException(error_message)
         db.session().add(resource)
         db.session().commit()
-        return self._created_response(resource)
+        return self.response_with_content(resource)
 
     def _meta(self): # TODO : Rename to __meta__ or meta
         """Return a description of this resource as reported by the
@@ -219,7 +219,7 @@ class Service(MethodView):
                     filters.append(getattr(self.__model__, key) == value)
                 else:
                     raise BadRequestException('Invalid field [{}]'.format(key))
-                queryset = queryset.filter(*filters).order_by(*order) # TODO : Dedent this by one
+            queryset = queryset.filter(*filters).order_by(*order)
         if 'page' in request.args:
             resources = queryset.paginate(page=int(request.args['page']), per_page=limit).items
         else:
@@ -227,7 +227,7 @@ class Service(MethodView):
             resources = queryset.all()
         return [r.to_dict() for r in resources]
 
-    def _export(self, collection):
+    def records2json(self, collection):
         """Return a CSV of the resources in *collection*.
 
         :param list collection: A list of resources represented by dicts
@@ -242,7 +242,7 @@ class Service(MethodView):
 
 
     @staticmethod
-    def _no_content_response():
+    def response_without_content():
         """Return an HTTP 204 "No Content" response.
 
         :returns: HTTP Response
@@ -252,7 +252,7 @@ class Service(MethodView):
         return response
 
     @staticmethod
-    def _created_response(resource):
+    def response_with_content(resource):
         """Return an HTTP 201 "Created" response.
 
         :returns: HTTP Response
