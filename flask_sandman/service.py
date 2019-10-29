@@ -1,16 +1,17 @@
 """Automatically generated REST API services from SQLAlchemy
 ORM models or a database introspection."""
 
-# Third-party imports
+# Flask
 import flask
-from flask import current_app, request, make_response
+from flask import current_app
+from flask import request, make_response
 from flask.views import MethodView
+# SQLAlchemy
 from sqlalchemy import asc, desc
-
-# Application imports
-from flask_sandman.exception import NotFoundException, BadRequestException
-from flask_sandman.database import DATABASE as db
-from flask_sandman.decorators import etag, validate_fields
+# Sandman
+from .exception import NotFoundException, BadRequestException
+from .database import DATABASE as db
+from .decorators import etag, validate_fields
 
 
 def add_link_headers(response, links):
@@ -64,7 +65,13 @@ class Service(MethodView):
 
     #: The string used to describe the elements when a collection is
     #: returned.
-    __json_collection_name__ = 'resources'
+    __json_collection_name__ = None # 'resources' # None #  TODO : Make this None by default; rename this as collective_noun
+
+    __exporters__ = {
+        "meta": lambda self : self.field_meta(),
+        "csv" : lambda self : self.records2csv(self.records()),  # self.records2JSON({self.__json_collection_name__: self._all_resources()} if self.__json_collection_name__ else self._all_resources())
+        "json": lambda self : self.records2json(self.records()),  # self.records2JSON({self.__json_collection_name__: self._all_resources()} if self.__json_collection_name__ else self._all_resources())
+        }
 
     def delete(self, resource_id):
         """Return an HTTP response object resulting from a HTTP DELETE call.
@@ -88,23 +95,26 @@ class Service(MethodView):
 
         :param resource_id: The value of the resource's primary key
         """
-        if request.path.endswith('meta'):
-            return self._meta()
+        if request.path.endswith('.meta'):
+            return self.field_meta()
+        if request.path.endswith('.csv'):
+            return self.records2csv(self.records())
+        if request.path.endswith('.json'): # Continuity
+            return self.records2json(self.records())
 
         if resource_id is None:
             error_message = is_valid_method(self.__model__)
             if error_message:
                 raise BadRequestException(error_message)
-
-            if 'export' in request.args: 
-                return self.records2csv(self.records())
-            return flask.jsonify({self.__json_collection_name__: self.records()})
+            if 'export' in request.args:
+                return self.__exporters__.get(request.args.get("export","csv"), self.__exporters__["csv"])(self)
+            return self.__exporters__["json"](self)
         else:
             resource = self.record(resource_id)
             error_message = is_valid_method(self.__model__, resource)
             if error_message:
                 raise BadRequestException(error_message)
-            return jsonify(resource)
+            return self.record2json(resource)
 
     def patch(self, resource_id):
         """Return an HTTP response object resulting from an HTTP PATCH call.
@@ -123,7 +133,7 @@ class Service(MethodView):
         resource.update(request.json)
         db.session().merge(resource)
         db.session().commit()
-        return jsonify(resource)
+        return self.record2json(resource)
 
     @validate_fields
     def post(self):
@@ -170,7 +180,7 @@ class Service(MethodView):
             resource.update(request.json)
             db.session().merge(resource)
             db.session().commit()
-            return jsonify(resource)
+            return self.record2json(resource)
 
         resource = self.__model__(**request.json)  # pylint: disable=not-callable
         error_message = is_valid_method(self.__model__, resource)
@@ -180,7 +190,7 @@ class Service(MethodView):
         db.session().commit()
         return self.response_with_content(resource)
 
-    def _meta(self):
+    def field_meta(self):
         """Return a description of this resource as reported by the
         database."""
         return flask.jsonify(self.__model__.description())
@@ -226,21 +236,30 @@ class Service(MethodView):
         else:
             queryset = queryset.limit(limit)
             resources = queryset.all()
-        return [r.to_dict() for r in resources]
+        return [r.retrieve() for r in resources]
 
-    def records2csv(self, collection):
-        """Return a CSV of the resources in *collection*.
-
-        :param list collection: A list of resources represented by dicts
-        """
+    @staticmethod
+    def records2csv(collection, sep = ','):
+        """Convert a collection of records to JSON"""
         fieldnames = collection[0].keys()
-        faux_csv = ','.join(fieldnames) + '\r\n'
+        faux_csv = sep.join(fieldnames) + '\r\n'
         for resource in collection:
-            faux_csv += ','.join((str(x) for x in resource.values())) + '\r\n'
+            faux_csv += sep.join((str(x) for x in resource.values())) + '\r\n'
         response = make_response(faux_csv)
         response.mimetype = 'text/csv'
         return response
 
+    @staticmethod
+    def records2json(resources):
+        """Convert a collection of records to JSON"""
+        return flask.jsonify(resources)
+
+    @staticmethod
+    def record2json(resource):
+        """Convert a record to JSON"""
+        response = flask.jsonify(resource.retrieve())
+        response = add_link_headers(response, resource.links())
+        return response
 
     @staticmethod
     def response_sans_content():
@@ -282,6 +301,12 @@ def register(router, service, primary_key_type):
         router.add_url_rule('/{resource}.meta'.format(resource=resource),
                             view_func=view_func,
                             methods=['GET'])
+        router.add_url_rule('/{resource}.csv'.format(resource=resource),
+                        view_func=view_func,
+                        methods=['GET'])
+        router.add_url_rule('/{resource}.json'.format(resource=resource),
+                        view_func=view_func,
+                        methods=['GET'])
     if 'POST' in methods:  # pylint: disable=no-member
         router.add_url_rule('/{resource}/'.format(resource=resource),
                             view_func=view_func,

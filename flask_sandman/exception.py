@@ -96,8 +96,7 @@ def register(app):
     @app.errorhandler(NotImplementedException)
     @app.errorhandler(ServiceUnavailableException)
     def handle_application_error(error):  # pylint:disable=unused-variable
-        """Handler used to send JSON error messages rather than default HTML
-        ones."""
+        """Handler used to send JSON error messages rather than default HTML ones"""
         response = jsonify(error.to_dict())
         response.status_code = error.code
         return response
