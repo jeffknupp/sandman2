@@ -71,13 +71,13 @@ class Service(MethodView):
 
         :param resource_id: The value of the resource's primary key
         """
-        resource = self._resource(resource_id)
+        resource = self.record(resource_id)
         error_message = is_valid_method(self.__model__, resource)
         if error_message:
             raise BadRequestException(error_message)
         db.session().delete(resource)
         db.session().commit()
-        return self._no_content_response()
+        return self.response_sans_content()
 
     @etag
     def get(self, resource_id=None):
@@ -97,13 +97,10 @@ class Service(MethodView):
                 raise BadRequestException(error_message)
 
             if 'export' in request.args: 
-                return self._export(self._all_resources())
-
-            return flask.jsonify({
-                self.__json_collection_name__: self._all_resources()
-                })
+                return self.records2csv(self.records())
+            return flask.jsonify({self.__json_collection_name__: self.records()})
         else:
-            resource = self._resource(resource_id)
+            resource = self.record(resource_id)
             error_message = is_valid_method(self.__model__, resource)
             if error_message:
                 raise BadRequestException(error_message)
@@ -117,7 +114,7 @@ class Service(MethodView):
         :returns: ``HTTP 404`` if the resource is not found
         :param resource_id: The value of the resource's primary key
         """
-        resource = self._resource(resource_id)
+        resource = self.record(resource_id)
         error_message = is_valid_method(self.__model__, resource)
         if error_message:
             raise BadRequestException(error_message)
@@ -142,7 +139,7 @@ class Service(MethodView):
             error_message = is_valid_method(self.__model__, resource)
             if error_message:
                 raise BadRequestException(error_message)
-            return self._no_content_response()
+            return self.response_sans_content()
 
         resource = self.__model__(**request.json)  # pylint: disable=not-callable
         error_message = is_valid_method(self.__model__, resource)
@@ -150,7 +147,7 @@ class Service(MethodView):
             raise BadRequestException(error_message)
         db.session().add(resource)
         db.session().commit()
-        return self._created_response(resource)
+        return self.response_with_content(resource)
 
     def put(self, resource_id):
         """Return the JSON representation of a new resource created or updated
@@ -181,14 +178,14 @@ class Service(MethodView):
             raise BadRequestException(error_message)
         db.session().add(resource)
         db.session().commit()
-        return self._created_response(resource)
+        return self.response_with_content(resource)
 
     def _meta(self):
         """Return a description of this resource as reported by the
         database."""
         return flask.jsonify(self.__model__.description())
 
-    def _resource(self, resource_id):
+    def record(self, resource_id):
         """Return the ``flask_sandman.model.Model`` instance with the given
         *resource_id*.
 
@@ -199,7 +196,7 @@ class Service(MethodView):
             raise NotFoundException()
         return resource
 
-    def _all_resources(self):
+    def records(self):
         """Return the complete collection of resources as a list of
         dictionaries.
 
@@ -231,7 +228,7 @@ class Service(MethodView):
             resources = queryset.all()
         return [r.to_dict() for r in resources]
 
-    def _export(self, collection):
+    def records2csv(self, collection):
         """Return a CSV of the resources in *collection*.
 
         :param list collection: A list of resources represented by dicts
@@ -246,7 +243,7 @@ class Service(MethodView):
 
 
     @staticmethod
-    def _no_content_response():
+    def response_sans_content():
         """Return an HTTP 204 "No Content" response.
 
         :returns: HTTP Response
@@ -256,7 +253,7 @@ class Service(MethodView):
         return response
 
     @staticmethod
-    def _created_response(resource):
+    def response_with_content(resource):
         """Return an HTTP 201 "Created" response.
 
         :returns: HTTP Response
