@@ -16,7 +16,6 @@ from .service import Service, register as register_service
 
 
 class Model(object):
-
     """The flask_sandman Model class is the base class for all RESTful resources.
     There is a one-to-one mapping between a table in the database and a
     :class:`flask_sandman.model.Model`.
@@ -76,20 +75,6 @@ class Model(object):
             cls.__table__.primary_key.columns)[  # pylint: disable=no-member
                 0].key
 
-    def to_dict(self):
-        """Return the resource as a dictionary.
-
-        :rtype: dict
-        """
-        result_dict = {}
-        for column in self.__table__.columns.keys():  # pylint: disable=no-member
-            value = result_dict[column] = getattr(self, column, None)
-            if isinstance(value, Decimal):
-                result_dict[column] = float(result_dict[column])
-            elif isinstance(value, datetime.datetime):
-                result_dict[column] = value.isoformat()
-        return result_dict
-
     def links(self):
         """Return a dictionary of links to related resources that should be
         included in the *Link* header of an HTTP response.
@@ -114,16 +99,36 @@ class Model(object):
         """
         return self.__url__ + '/' + str(getattr(self, self.primary_key()))
 
-    def update(self, attributes):
+    def to_dict(self):
+        """Return the resource as a dictionary.
+
+        :rtype: dict
+        """
+        result_dict = {}
+        for column in self.__table__.columns.keys():  # pylint: disable=no-member
+            value = result_dict[column] = getattr(self, column, None)
+            if isinstance(value, Decimal):
+                result_dict[column] = float(result_dict[column])
+            elif isinstance(value, datetime.datetime):
+                result_dict[column] = value.isoformat()
+        return result_dict
+
+    def from_dict(self, data):
         """Update the current instance based on attribute->value items in
         *attributes*.
 
-        :param dict attributes: Dictionary of attributes to be updated
+        :param dict data: Dictionary of attributes to be updated
         :rtype: :class:`sandman2.model.Model`
         """
-        for attribute in attributes:
-            setattr(self, attribute, attributes[attribute])
+        for key in data:
+            setattr(self, key, data[key])
         return self
+
+    def retrieve(self): # Rename to pull; get might be better still
+        return self.to_dict()
+
+    def update(self, data): # Rename to push; put/post might be better still
+        return self.from_dict(data)
 
     @classmethod
     def description(cls):
