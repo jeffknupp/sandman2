@@ -9,12 +9,16 @@ class EndpointException(Exception):
         super(EndpointException, self).__init__(message)
         self.message = message
         self.payload = payload
+        # self.payload = payload
 
     def to_dict(self):
         """Return a dictionary representation of the exception."""
         as_dict = dict(self.payload or ())
         as_dict['message'] = self.message
         return as_dict
+        # error = {# "payload" : self.payload or (),
+        #          "message" : self.message}
+        # return error
 
 
 class BadRequestException(EndpointException):
@@ -98,6 +102,16 @@ def register(app):
     def handle_application_error(error):  # pylint:disable=unused-variable
         """Handler used to send JSON error messages rather than default HTML
         ones."""
+        # Currently
+        # if app.config.get("APP_TYPE") == FlaskAPI :
+        #     response = error.to_dict()
+        #     # response["error_code"] = error.code
+        #     return response, error.code
+        # else :
+        #     response = jsonify(error.to_dict())
+        #     response.error_code = error.code
+        #     return response, error.code
+        # Originally
         response = jsonify(error.to_dict())
         response.status_code = error.code
         return response

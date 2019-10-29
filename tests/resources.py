@@ -18,12 +18,15 @@ RESOURCE_ETAGS = (
 )
 
 COLLECTION_ETAGS = (
+    # Original ETags
     '"4368a846206ec071cb251951b958c2a0"',
     '"f8d044bc2810a3758722557101e1f4a2"',
     '"8527642c9c0fbbd6807e49c30d93a2c6"',
     '"90f8a11222df8b83d6f1cee626a154a5"',
     '"c59f5215ea673b399145eccfcbb3e89c"',
     '"207ab6c6190915dbde0cba288e5ce35d"',
+    # Updated ETags (Since the collection is no longer nested under resources)
+    '"4042d59977793af77f719c75ca36e2e3"',
 )
 
 
