@@ -1,35 +1,39 @@
-"""This module contains the custom admin class that allows for a nicer admin
-interface."""
-
-# pylint: disable=maybe-no-member,too-few-public-methods
-
+"""This module contains the custom admin class that allows for a nicer admin interface."""
 # Third-party imports
 from flask_admin.contrib.sqla import ModelView
 
-# Application imports
+# Functools
+from functools import partial
+# Package resources
+import pkg_resources
+# Flask: Administration
+from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
+# Sandman
 from .database import DATABASE as db
 
-class AdminView(ModelView):  # pylint: disable=no-init
+class AdminView(ModelView):
     """Define custom templates for each view."""
-    list_template = 'list.html'
-    create_template = 'create.html'
-    edit_template = 'edit.html'
+    list_template   = "list.html"          or pkg_resources.resource_filename("flask_sandman", "templates/list.html")
+    create_template = "create.html"        or pkg_resources.resource_filename("flask_sandman", "templates/create.html")
+    edit_template   = "edit.html"          or pkg_resources.resource_filename("flask_sandman", "sandman2/templates/edit.html")
     column_display_pk = True
 
 
-def register(router, model, database = db, admin_view = AdminView):
+administration = partial(Admin, base_template='layout.html', template_mode='bootstrap3') # base_template defaults to bootstrap(2|3)/admin/base.html in Flask-Admin
+
+def register(router, model, database = db, view = AdminView):
     """Register an administration view for each model
 
     :param app: Flaks application
     :param list models: A list of AutomapModels
     :param Admin router: An instance of Flask's Admin
-    :param ModelView admin_view:
+    :param ModelView view:
     :return:
     """
     if hasattr(model, "__admin__") and model.__admin__:
-        view = model.__admin__(database.session) # TODO : Experimental : This allows users to provide their own admin views upon custom models
+        admin_view = model.__admin__(database.session) # TODO : Experimental : This allows users to provide their own admin views upon custom models
     else:
-        view = admin_view(model, database.session)
-    router.add_view(view)
-    return view
-
+        admin_view = view(model, database.session)
+    router.add_view(admin_view)
+    return admin_view

@@ -1,16 +1,13 @@
 """Sandman2 main application setup code."""
-
 # Third-party imports
 from flask import Flask, current_app, jsonify
-
-# Application imports
-from flask_sandman.database import DATABASE as db
-from flask_sandman.api import sandman
+# Flask: Admin
 from flask_admin import Admin
+# Sandman
+from .api import sandman
 # from flask_httpauth import HTTPBasicAuth
 
-# Augment flask_sandman's Model class with the Automap and Flask-SQLAlchemy model
-# classes
+# Augment flask_sandman's Model class with the Automap and Flask-SQLAlchemy model classes
 # auth = HTTPBasicAuth()
 
 def application(
@@ -36,11 +33,14 @@ def application(
     app.config['SANDMAN2_READ_ONLY'] = read_only
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.classes = []
+    # Database
+    from .database import DATABASE as db
     db.init_app(app)
-    admin = Admin(app, base_template='layout.html', template_mode='bootstrap3')
+    # Administration
+    from .admin import administration
+    # admin = Admin(app, base_template = 'layout.html', template_mode = 'bootstrap3')
+    admin = administration(app)
+    # Sandman
     sandman(app, database=db, include_models=include_models or [], exclude_tables=exclude_tables or [], read_only=read_only, admin = admin, schema=schema)
     return app
-
-
-
 
