@@ -1,13 +1,11 @@
 """Module containing code related to *flask_sandman* ORM models."""
-
-# Standard library imports
+# Standard Library
 import datetime
 from decimal import Decimal
 # SQLAlchemy
 from sqlalchemy.inspection import inspect
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.ext.declarative import declarative_base
-# SQLAlchemy
 from sqlalchemy.sql import sqltypes
 
 # Application imports
@@ -75,6 +73,20 @@ class Model(object):
             cls.__table__.primary_key.columns)[  # pylint: disable=no-member
                 0].key
 
+    def to_dict(self):
+        """Return the resource as a dictionary.
+
+        :rtype: dict
+        """
+        result_dict = {}
+        for column in self.__table__.columns.keys():  # pylint: disable=no-member
+            value = result_dict[column] = getattr(self, column, None)
+            if isinstance(value, Decimal):
+                result_dict[column] = float(result_dict[column])
+            elif isinstance(value, datetime.datetime):
+                result_dict[column] = value.isoformat()
+        return result_dict
+
     def links(self):
         """Return a dictionary of links to related resources that should be
         included in the *Link* header of an HTTP response.
@@ -111,6 +123,8 @@ class Model(object):
                 result_dict[column] = float(result_dict[column])
             elif isinstance(value, datetime.datetime):
                 result_dict[column] = value.isoformat()
+            elif isinstance(value, datetime.time):
+                result_dict[column] = value.strftime("%H:%M:%S")
         return result_dict
 
     def from_dict(self, data):
