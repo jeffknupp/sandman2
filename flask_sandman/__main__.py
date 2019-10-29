@@ -11,7 +11,7 @@ parser = argparse.ArgumentParser(
     )
 parser.add_argument(
     'URI',
-help='Database URI in the format DATABASE+PROTOCOL://USERNAME:PASSWORD@HOSTNAME:HOSTPORT/DATASTORE')
+    help='Database URI in the format DATABASE+PROTOCOL://USERNAME:PASSWORD@HOSTNAME:HOSTPORT/DATASTORE')
 parser.add_argument(
     '-d',
     '--debug',
@@ -41,12 +41,19 @@ parser.add_argument(
     '--schema',
     help='Use this named schema instead of default',
     default=None)
-
+parser.add_argument(
+        '-e',
+        '--enable-cors',
+        help='Enable Cross Origin Resource Sharing (CORS)',
+        default=False)
 
 def main(parser = parser):
     """Main entry point for script."""
     args = parser.parse_args()
     app = create_app(args.URI, read_only=args.read_only, schema=args.schema)
+    if args.enable_cors:
+        from flask_cors import CORS
+        CORS(app)
     if args.debug:
         app.config['DEBUG'] = True
     if args.local_only:

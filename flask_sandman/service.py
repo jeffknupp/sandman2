@@ -228,7 +228,7 @@ class Service(MethodView):
                     filters.append(getattr(self.__model__, key) == value)
                 else:
                     raise BadRequestException('Invalid field [{}]'.format(key))
-                queryset = queryset.filter(*filters).order_by(*order)
+            queryset = queryset.filter(*filters).order_by(*order)
         if 'page' in request.args:
             resources = queryset.paginate(page=int(request.args['page']), per_page=limit).items
         else:
