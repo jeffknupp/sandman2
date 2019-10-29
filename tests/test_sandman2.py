@@ -31,7 +31,7 @@ def test_get_collection(client):
     response = client.get('/artist/')
     assert response.status_code == 200
     json_response = json.loads(
-        response.get_data(as_text=True))['resources']
+        response.get_data(as_text=True))
     assert len(json_response) == 276
     assert response.headers['Content-type'] == 'application/json'
     assert response.headers['ETag'] in COLLECTION_ETAGS
@@ -118,7 +118,7 @@ def test_search_collection(client):
     response = client.get('/artist/?Name=Calexico')
     assert response.status_code == 200
     json_response = json.loads(
-        response.get_data(as_text=True))['resources']
+        response.get_data(as_text=True))
     assert len(json_response) == 1
     assert response.headers['Content-type'] == 'application/json'
 
@@ -195,5 +195,10 @@ def test_etag_not_modified(client):
 def test_meta_endpoint(client):
     """Can we retrieve a description of the resource from its 'meta'
     endpoint?"""
-    response = client.get('/artist/meta')
+    response = client.get('/artist.meta')
+    assert json.loads(response.get_data(as_text=True)) == ARTIST_META
+
+def test_meta_export(client):
+    """Can we retrieve a description of the resource from its 'meta' export ?"""
+    response = client.get('/artist/?export=meta')
     assert json.loads(response.get_data(as_text=True)) == ARTIST_META
