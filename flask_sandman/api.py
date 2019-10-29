@@ -1,11 +1,11 @@
-from flask_sandman.database import DATABASE as db
-from flask_sandman.exception import register as register_exceptions
-from flask_sandman.model import Model, AutomapModel, register as register_model_view
-from flask_sandman.views import register_index
-from .admin import register as register_admin_view
+from .database import DATABASE as db
+from .exception import register as register_exceptions
+from .model import AutomapModel, Model as BaseModel, register as register_model_view
+from .views import register as register_index
+from .admin import AdminView, register as register_admin_view
 
-def sandman(application, database = db, blueprint = None, include_models = [], exclude_tables = [], read_only = True, admin = None, root = "/", schema = None):
-
+def sandman(application, database = db, blueprint = None, include_models = [], exclude_tables = [], read_only = True, admin = None, root = "/", admin_view = AdminView, schema = None):
+    """"""
     # Sandman Exceptions
     register_exceptions(application)
     # Router
@@ -23,13 +23,13 @@ def sandman(application, database = db, blueprint = None, include_models = [], e
             router.model_views.append(register_model_view(router, model))
             # Admin Views
             if admin:
-                router.admin_views.append(register_admin_view(admin, model))
+                router.admin_views.append(register_admin_view(admin, model, view = admin_view))
         # API Index
         if root: register_index(router, root)
     return router
 
 
-def register_entities(database, include_models = [], exclude_tables = [], read_only = True, schema=None, automodel = AutomapModel):
+def register_entities(database, include_models = [], exclude_tables = [], read_only = True, schema = None, automodel = AutomapModel):
     models = []
     tablename = lambda model : getattr(getattr(model, "__table__"), "name", "") if hasattr(model, "__table__") else getattr(model, "__tablename__", "")
     automodel.prepare(database.engine, reflect=True, schema=schema)

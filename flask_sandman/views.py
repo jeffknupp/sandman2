@@ -1,6 +1,6 @@
 from flask import jsonify
 
-def register_index(router, root = "/"):
+def register(router, root ="/"):
     """Creates a root endpoint for the API
 
     This takes a list of :class:`ModelView` classes and creates an endpoint that simply lists them.
