@@ -25,6 +25,15 @@ class BadRequestException(EndpointException):
     code = 400
 
 
+class ConflictException(EndpointException):
+    """Similar to a ServerErrorException (HTTP 500) but there is some action the
+    client may take to resolve the conflict, after which the request can be
+    resubmitted. A request to reprocess a job not marked for reprocessing, for
+    example, could cause this exception to be raised."""
+
+    code = 409
+
+
 class ForbiddenException(EndpointException):
     """Raised when a request asks us to do something that we won't do because it
     violates the application logic.
@@ -49,13 +58,12 @@ class NotAcceptableException(EndpointException):
     code = 406
 
 
-class ConflictException(EndpointException):
-    """Similar to a ServerErrorException (HTTP 500) but there is some action the
-    client may take to resolve the conflict, after which the request can be
-    resubmitted. A request to reprocess a job not marked for reprocessing, for
-    example, could cause this exception to be raised."""
+class NotImplementedException(EndpointException):
+    """Raised when the application does not implement the functionality being
+    requested. Note that this doesn't refer to an HTTP method not being
+    implemented for a given endpoint (which would be a 405 error)."""
 
-    code = 409
+    code = 501
 
 
 class ServerErrorException(EndpointException):
@@ -63,14 +71,6 @@ class ServerErrorException(EndpointException):
     request itself (for example, a database error)."""
 
     code = 500
-
-
-class NotImplementedException(EndpointException):
-    """Raised when the application does not implement the functionality being
-    requested. Note that this doesn't refer to an HTTP method not being
-    implemented for a given endpoint (which would be a 405 error)."""
-
-    code = 501
 
 
 class ServiceUnavailableException(EndpointException):
