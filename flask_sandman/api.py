@@ -14,7 +14,7 @@ def sandman(application, database = db, blueprint = None, include_models = [], e
     # api = api or app
     with application.app_context():
         # Database Tables
-        router.included_models, router.excluded_models = register_entities(database, include_models, exclude_tables, read_only, schema=schema)
+        router.included_models, router.excluded_models = register_entities(database, include_models = include_models, exclude_tables = exclude_tables, read_only = read_only, schema = schema)
         # router.models = router.included_models + router.excluded_models # Mostly used for development
         router.model_views = []
         router.admin_views = []

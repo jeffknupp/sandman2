@@ -36,6 +36,7 @@ def application(
     # Database
     from .database import DATABASE as db
     db.init_app(app)
+    app.database = db
     # Administration
     from .admin import administration
     # admin = Admin(app, base_template = 'layout.html', template_mode = 'bootstrap3')
