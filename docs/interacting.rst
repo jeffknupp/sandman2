@@ -164,7 +164,7 @@ Pagination
 ----------
 
 When you perform an HTTP GET ``request`` on a collection, the default behavior is to return *all* of the results in the
-collection, though these results are *paginated*. _Pagination_ breaks up a long list of results into identicallly-sized chunks, called *pages*. Each page contains a predetermined number of results (``sandman2`` uses a default size of ``20``). Each paged response also contains a ``Link`` header that will include the URL for the previous, next, first, and last page of results (where applicable).
+collection, though these results are *paginated*. _Pagination_ breaks up a long list of results into identically-sized chunks, called *pages*. Each page contains a predetermined number of results (``sandman2`` uses a default size of ``20``). Each paged response also contains a ``Link`` header that will include the URL for the previous, next, first, and last page of results (where applicable).
 
 Controlling pagination
 ``````````````````````
