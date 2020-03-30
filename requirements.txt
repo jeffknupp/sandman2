@@ -9,7 +9,7 @@ Flask-Cors==3.0.8
 pytest-cov==2.8.1
 pytest-flask==1.0.0
 six==1.14.0
-wcwidth==0.1.7
+wcwidth==0.1.9
 Werkzeug==0.15.4
 WTForms==2.2.1
 zipp==0.5.1
