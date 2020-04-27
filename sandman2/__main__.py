@@ -50,8 +50,8 @@ def main():
         '-e',
         '--enable-cors',
         help='Enable Cross Origin Resource Sharing (CORS)',
+        action='store_true',
         default=False)
-
 
     args = parser.parse_args()
     app = get_app(args.URI, read_only=args.read_only, schema=args.schema)
