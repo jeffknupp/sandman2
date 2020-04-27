@@ -58,7 +58,7 @@ def main():
     if args.enable_cors:
         from flask_cors import CORS
         CORS(app)
-     if args.debug:
+    if args.debug:
         app.config['DEBUG'] = True
     if args.local_only:
         host = '127.0.0.1'
