@@ -4,6 +4,8 @@
 
 [sandman2 documentation](http://sandman2.readthedocs.io/en/latest/)
 
+ [ ~ Dependencies scanned by PyUp.io ~ ]
+
 `sandman2` automagically generates a RESTful API service from your existing database,
 without requiring you to write a line of code. Simply point `sandman2` to your
 database, add salt for seasoning, and voila!, a fully RESTful API service with
