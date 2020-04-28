@@ -213,7 +213,7 @@ class Service(MethodView):
             order = []
             for key, value in args.items():
                 if value.startswith('%'):
-                    filters.append(getattr(self.__model__, key).like(str(value), escape='/'))
+                    filters.append(getattr(self.__model__, key).like(str(value[1:]), escape='/'))
                 elif key == 'sort':
                     direction = desc if value.startswith('-') else asc
                     order.append(direction(getattr(self.__model__, value.lstrip('-'))))
