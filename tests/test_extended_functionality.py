@@ -26,11 +26,19 @@ def test_filtering_unkown_field(client):
     assert response.status_code == 400
 
 
-def test_wildcard_filtering(client):
+def test_wildcard_filtering1(client):
     """Do we return filtered results when a wildcarded URL parameter is provided?"""
-    response = client.get('/artist/?Name=%25%25DC')
+    response = client.get('/artist/?Name=%25%25%25DC')
     assert response.status_code == 200
     assert len(response.json['resources']) == 1
+    assert response.json['resources'][0]['ArtistId'] == 1
+
+
+def test_wildcard_filtering2(client):
+    """Do we return filtered results when a wildcarded URL parameter is provided?"""
+    response = client.get('/artist/?Name=%25AC%25%25')
+    assert response.status_code == 200
+    assert len(response.json['resources']) == 7
     assert response.json['resources'][0]['ArtistId'] == 1
 
 

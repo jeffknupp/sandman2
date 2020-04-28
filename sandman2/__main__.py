@@ -50,15 +50,15 @@ def main():
         '-e',
         '--enable-cors',
         help='Enable Cross Origin Resource Sharing (CORS)',
+        action='store_true',
         default=False)
-
 
     args = parser.parse_args()
     app = get_app(args.URI, read_only=args.read_only, schema=args.schema)
     if args.enable_cors:
         from flask_cors import CORS
         CORS(app)
-     if args.debug:
+    if args.debug:
         app.config['DEBUG'] = True
     if args.local_only:
         host = '127.0.0.1'

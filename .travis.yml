@@ -3,10 +3,11 @@ python:
   - 2.7
   - 3.5
   - 3.6
+  - 3.8
 sudo: false
 install:
   - travis_retry python setup.py develop
-  - travis_retry pip install pytest-cov coverage coveralls
+  - travis_retry pip install markupsafe==1.1.1 pytest-cov coverage coveralls
 script:
   - coverage run --source=sandman2 setup.py test
 after_success:
