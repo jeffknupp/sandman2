@@ -5,12 +5,12 @@ clean:
 
 install:
 	python -m venv venv && \
-		source venv/bin/activate && \
+		. venv/bin/activate && \
 		pip install -r requirements.txt
 
 docs: install
 	cd docs && make html && cd ..
 
 test: install
-	source venv/bin/activate && \
+	. venv/bin/activate && \
 		py.test --cov=sandman2 tests
