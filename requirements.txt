@@ -5,7 +5,7 @@ SQLAlchemy==1.3.19
 WTForms==2.3.3
 coverage==5.2.1
 pytest==6.0.1
-Flask-Cors==3.0.8
+Flask-Cors==3.0.9
 pytest-cov==2.7.1
 pytest-flask==0.15.0
 six==1.12.0
