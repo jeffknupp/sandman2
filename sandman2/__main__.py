@@ -58,7 +58,7 @@ def main():
     if args.enable_cors:
         from flask_cors import CORS
         CORS(app)
-     if args.debug:
+    if args.debug:
         app.config['DEBUG'] = True
     if args.local_only:
         host = '127.0.0.1'
@@ -66,7 +66,6 @@ def main():
         host = '0.0.0.0'
     app.config['SECRET_KEY'] = '42'
     app.run(host=host, port=int(args.port))
-
 
 if __name__ == '__main__':
     main()
