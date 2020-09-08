@@ -1,5 +1,6 @@
 # sandman2
 [![Build Status](https://travis-ci.com/jeffknupp/sandman2.svg?branch=master)](https://travis-ci.com/jeffknupp/sandman2)
+[![Documentation Status](https://readthedocs.org/projects/sandman2/badge/?version=latest)](https://sandman2.readthedocs.io/en/latest/?badge=latest)
 [![Coverage Status](https://coveralls.io/repos/jeffknupp/sandman2/badge.svg?branch=master&service=github)](https://coveralls.io/github/jeffknupp/sandman2?branch=master)
 
 [sandman2 documentation](http://sandman2.readthedocs.io/en/latest/)

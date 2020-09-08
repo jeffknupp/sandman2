@@ -1,7 +1,7 @@
 sandman2
 ========
 
-|Build Status| |Coverage Status|
+|Build Status| |Documentation Status| |Coverage Status|
 
 `sandman2 documentation <http://sandman2.readthedocs.io/en/latest/>`__
 
@@ -175,6 +175,9 @@ Pass each value separately to the ``docker run`` command with
 ``-e <VARIABLE>=<VALUE>``. Not all are required, but which ones are
 required differs based on your target RDBMS.
 
+.. |Documentation Status| image:: https://readthedocs.org/projects/sandman2/badge/?version=latest
+:target: https://sandman2.readthedocs.io/en/latest/?badge=latest
+:alt: Documentation Statusk
 .. |Build Status| image:: https://travis-ci.com/jeffknupp/sandman2.svg?branch=master
    :target: https://travis-ci.com/jeffknupp/sandman2
 .. |Coverage Status| image:: https://coveralls.io/repos/jeffknupp/sandman2/badge.svg?branch=master&service=github
