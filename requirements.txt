@@ -3,7 +3,7 @@ Flask-Admin==1.5.8
 Flask-SQLAlchemy==2.5.1
 SQLAlchemy==1.4.9
 WTForms==2.3.3
-coverage==5.3
+coverage==5.5
 pytest==6.2.0
 Flask-Cors==3.0.9
 pytest-cov==2.10.1
