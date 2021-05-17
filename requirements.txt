@@ -4,7 +4,7 @@ Flask-SQLAlchemy==2.5.1
 SQLAlchemy==1.4.15
 WTForms==2.3.3
 coverage==5.5
-pytest==6.2.0
+pytest==6.2.4
 Flask-Cors==3.0.9
 pytest-cov==2.10.1
 pytest-flask==1.1.0
