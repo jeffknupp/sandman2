@@ -6,7 +6,7 @@ WTForms==2.3.3
 coverage==6.1.1
 pytest==6.2.5
 Flask-Cors==3.0.10
-pytest-cov==2.10.1
+pytest-cov==3.0.0
 pytest-flask==1.1.0
 six==1.15.0
 wcwidth==0.2.5
