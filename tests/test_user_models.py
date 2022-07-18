@@ -65,7 +65,7 @@ def test_validate_post_existing_resource(client):
 
 def test_validate_put_existing(client):
     """Do we get back an error message when making a PUT request for
-    an exisitng resource?"""
+    an existing resource?"""
     response = client.put(
         '/user/1',
         data=json.dumps({

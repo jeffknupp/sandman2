@@ -17,7 +17,7 @@ classes reflected in the database and add a ``__unicode__`` member function.
 
 Imagine we have a simple blog application consisting of Blog, Post, and User
 models. As expected, each post belongs to a specific user and the model has the
-requisite foreign key to the User table. When we view a Post's assoicated user
+requisite foreign key to the User table. When we view a Post's associated user
 in the admin site, however, we see the following::
 
     <flask_sqlalchemy.user object at 0x10d3cea10>
@@ -59,5 +59,5 @@ classes. Deriving from ``sandman2.AutomapModel`` accomplishes this::
 
 Notice that you can refer to attributes of the class that you know to be present
 (like ``user.name``) without defining the ``name`` column; all other
-columns/properties are reflected. You're meerly *extending* the existing model
+columns/properties are reflected. You're merely *extending* the existing model
 class.
