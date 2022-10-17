@@ -1,7 +1,7 @@
 Flask==2.2.2
 Flask-Admin==1.6.0
 Flask-SQLAlchemy==3.0.2
-SQLAlchemy==1.3.20
+SQLAlchemy==1.4.42
 WTForms==2.3.3
 coverage==5.3
 pytest==6.2.0
