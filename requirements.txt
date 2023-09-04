@@ -7,7 +7,7 @@ coverage==7.3.0
 pytest==7.4.1
 Flask-Cors==4.0.0
 pytest-cov==4.1.0
-pytest-flask==1.1.0
+pytest-flask==1.2.0
 six==1.15.0
 wcwidth==0.2.5
 Werkzeug==1.0.1
