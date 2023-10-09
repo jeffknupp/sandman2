@@ -1,5 +1,5 @@
 Flask==3.0.0
-Flask-Admin==1.5.7
+Flask-Admin==1.6.1
 Flask-SQLAlchemy==2.4.4
 SQLAlchemy==1.3.20
 WTForms==2.3.3
