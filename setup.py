@@ -42,11 +42,15 @@ setup(
     author='Jeff Knupp',
     tests_require=['pytest', 'pytest-cov', 'pytest-flask'],
     install_requires=[
-        'Flask>=1.0.3',
-        'Flask-SQLAlchemy==2.4.0',
-        'SQLAlchemy==1.3.3',
-        'Flask-Admin>=1.5.3',
+        'itsdangerous==2.0.1',  # old json
+        'jinja2==3.0.3',  # jinja2 < 3.1.0 for jinja2.escape - alternative newer flask
+        'Werkzeug==1.0.1',
+        'Flask==1.1.2',
+        'Flask-SQLAlchemy==2.4.4',
+        'SQLAlchemy==1.3.20',
+        'Flask-Admin>=1.5.37',
         'Flask-HTTPAuth>=3.2.4',
+        'colorama',
         ],
     cmdclass={'test': PyTest},
     author_email='jeff@jeffknupp.com',
