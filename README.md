@@ -48,6 +48,7 @@ Install `sandman2` using `pip`: `$ pip install sandman2`. This provides the scri
 
 ```bash
 $ sandman2ctl sqlite+pysqlite:///database_file_name
+$ sandman2ctl sqlite+pysqlite:///examples/blog.sqlite3  # from a source code checkout
 ```
 
 To connect to a PostgreSQL database, make sure you install a driver like
