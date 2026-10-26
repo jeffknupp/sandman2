@@ -12,4 +12,4 @@ six==1.17.0
 wcwidth==0.9.4
 Werkzeug==3.1.9
 WTForms==3.3.1
-zipp==3.4.0
+zipp==4.1.2
